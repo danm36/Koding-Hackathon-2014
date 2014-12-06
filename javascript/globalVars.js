@@ -15,6 +15,7 @@ var _workspace = new Array();
 var mousePosition;
 var actualMousePosition;
 var mouseDown = false;
+var ctrlDownOnDrag = false;
 
 var targetPanPosition = new Vector(0, 0);
 var actualPanPosition = new Vector(0, 0);
@@ -41,6 +42,11 @@ var styleData = {
     
     pinFillColor: {
         flow: "#000000",
+        var: "#FF00FF",
+        string: "#00FF00",
+        number: "#0000FF",
+        object: "#FFFF00",
+        array: "#00FFFF",
     }
 };
 

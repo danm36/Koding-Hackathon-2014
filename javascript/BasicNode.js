@@ -52,10 +52,23 @@ var BasicNode = (function()
     {
         this.outputs[0].fire();
     }
+        
+    BasicNode.prototype.getValue = function(pin)
+    {
+        if(pin instanceof NodePin && pin.connectee !== undefined)
+            return pin.connectee.parent.getValue(undefined);
+        return undefined;
+    }
+    
+    BasicNode.prototype.setValue = function(pin, value)
+    {
+        if(pin instanceof NodePin && pin.connectee !== undefined)
+            pin.connectee.parent.setValue(undefined, value);
+    }
 		
 	BasicNode.prototype.update = function()
     {	
-        if(draggingEl === this)
+        if(draggingEl === this && ctrlDownOnDrag)
         {
             this.drawPos = mousePosition.Copy().Subtract(this.size.Divide(2));
         }
@@ -114,6 +127,9 @@ var BasicNode = (function()
         ctx.fillStyle = "#000000";
         var stringSize = ctx.measureText(this.displayName);
         this.size.x = Math.max(stringSize.width + 16, 128);
+        
+        var largerIO = Math.max(this.inputs.length, this.outputs.length) - 1;
+        this.size.y = 64 + 24 * largerIO;
     };
 	
 	BasicNode.prototype.draw = function(bDontClip)
@@ -156,7 +172,6 @@ var BasicNode = (function()
     
     BasicNode.prototype.drawConnectingLines = function()
     {
-        ctx.strokeStyle = "#000000";
         for(var i = 0; i < this.inputs.length; i++)
             this.inputs[i].drawConnectingLines();
         
@@ -177,6 +192,7 @@ var NodePin = (function()
         this.parent = parent;
         this.label = label || "";
         this.type = type;
+        this.radius = 16;
         if(!(otherSupportedTypes instanceof Array))
             otherSupportedTypes = new Array();
         otherSupportedTypes.push(type);
@@ -217,11 +233,11 @@ var NodePin = (function()
                         if( this.supportedTypes.indexOf(_workspace[i].inputs[j].type) >= 0 &&
                             mousePosition.x > _workspace[i].inputs[j].drawPos.x &&
                             mousePosition.y > _workspace[i].inputs[j].drawPos.y &&
-                            mousePosition.x < _workspace[i].inputs[j].drawPos.x + 16 &&
-                            mousePosition.y < _workspace[i].inputs[j].drawPos.y + 16)
+                            mousePosition.x < _workspace[i].inputs[j].drawPos.x + _workspace[i].inputs[j].radius &&
+                            mousePosition.y < _workspace[i].inputs[j].drawPos.y + _workspace[i].inputs[j].radius)
                         {
                             this.connectee = _workspace[i].inputs[j];
-                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this)
+                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this.connectee)
                                 this.connectee.connectee.connectee = undefined;
                             this.connectee.connectee = this;
                             return;
@@ -234,11 +250,11 @@ var NodePin = (function()
                     {                        
                         if( mousePosition.x > _workspace[i].outputs[j].drawPos.x &&
                             mousePosition.y > _workspace[i].outputs[j].drawPos.y &&
-                            mousePosition.x < _workspace[i].outputs[j].drawPos.x + 16 &&
-                            mousePosition.y < _workspace[i].outputs[j].drawPos.y + 16)
+                            mousePosition.x < _workspace[i].outputs[j].drawPos.x + _workspace[i].outputs[j].radius &&
+                            mousePosition.y < _workspace[i].outputs[j].drawPos.y + _workspace[i].outputs[j].radius)
                         {
                             this.connectee = _workspace[i].outputs[j];
-                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this)
+                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this.connectee)
                                 this.connectee.connectee.connectee = undefined;
                             this.connectee.connectee = this;
                             return;
@@ -274,8 +290,8 @@ var NodePin = (function()
 		if(draggingEl === undefined)
 		{
 			if(	mousePosition instanceof Vector && 
-				mousePosition.x > this.drawPos.x && mousePosition.x < this.drawPos.x + 16 &&
-				mousePosition.y > this.drawPos.y && mousePosition.y < this.drawPos.y + 16)
+				mousePosition.x > this.drawPos.x && mousePosition.x < this.drawPos.x + this.radius &&
+				mousePosition.y > this.drawPos.y && mousePosition.y < this.drawPos.y + this.radius)
 			{
 				this.bIsHovering = true;
 				hoveringEl = this;
@@ -302,15 +318,27 @@ var NodePin = (function()
         }
 				
         //Sets the fill color based on hovering and simulation mode. Lerped for a quick smooth animation
-		this.myFillColor = ColorLerp(this.myFillColor, ColorLighten(styleData.pinFillColor[this.type] !== undefined ? styleData.pinFillColor[this.type] : "#FFFF00", this.bIsHovering ? 0.5 : 0), 0.2);
+		this.myFillColor = ColorLerp(this.myFillColor, ColorLighten(styleData.pinFillColor[this.type] || "#000000", this.bIsHovering ? 0.5 : 0), 0.2);
     };
 	
 	NodePin.prototype.draw = function()
 	{             
-        ctx.fillStyle = this.myFillColor;      
+        ctx.fillStyle = ctx.strokeStyle = this.myFillColor;      
         
         ctx.beginPath();
-        ctx.fillRect(this.drawPos.x, this.drawPos.y, 16, 16);
+        
+        if(this.type == "flow")
+        {
+            DrawNPoly(this.drawPos.x + this.radius / 2, this.drawPos.y + this.radius / 2, this.radius, 3, Math.PI / 2);                
+        }
+        else
+        {
+            ctx.rect(this.drawPos.x, this.drawPos.y, this.radius, this.radius);
+        }
+        
+        ctx.stroke();
+        if(this.connectee === undefined)
+            ctx.fillStyle = SetOpacity(ctx.fillStyle, 0.3);
         ctx.fill();
         
         ctx.font = "8pt Trebuchet MS";
@@ -320,7 +348,7 @@ var NodePin = (function()
         if(this.isOutput)
             ctx.fillText(this.label, this.drawPos.x - stringWidth.width - 8, this.drawPos.y + 12); 
         else
-            ctx.fillText(this.label, this.drawPos.x + 24, this.drawPos.y + 12); 
+            ctx.fillText(this.label, this.drawPos.x + this.radius + 8, this.drawPos.y + 12); 
     };
     
     NodePin.prototype.drawConnectingLines = function()
@@ -332,15 +360,23 @@ var NodePin = (function()
         }
         else if(this.connectee !== undefined && this.isOutput)
         {
-            lineEndPoint = this.connectee.drawPos.Copy().Add(new Vector(8, 8));
+            lineEndPoint = this.connectee.drawPos.Copy().Add(new Vector(this.connectee.radius / 2, this.connectee.radius / 2));
         }
         
         if(lineEndPoint !== undefined)
         {
-            var controlPoint1 = new Vector(this.isOutput ? this.drawPos.x + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) : this.drawPos.x - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64), Lerp(this.drawPos.y + 8, lineEndPoint.y, 0.05));
-            var controlPoint2 = new Vector(this.isOutput ? lineEndPoint.x - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) : lineEndPoint.x + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64), Lerp(this.drawPos.y + 8, lineEndPoint.y, 0.95));
+            ctx.strokeStyle = styleData.pinFillColor[this.type] || "#000000";
+            
+            var controlPoint1 = new Vector(this.isOutput ?
+                                           this.drawPos.x + this.radius / 2 + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) :
+                                           this.drawPos.x + this.radius / 2 - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64),
+                                           Lerp(this.drawPos.y + this.radius / 2, lineEndPoint.y, 0.05));
+            var controlPoint2 = new Vector(this.isOutput ?
+                                           lineEndPoint.x - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) :
+                                           lineEndPoint.x + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64),
+                                           Lerp(this.drawPos.y + this.radius / 2, lineEndPoint.y, 0.95));
             ctx.beginPath();
-            ctx.moveTo(this.drawPos.x + 8, this.drawPos.y + 8);
+            ctx.moveTo(this.drawPos.x + this.radius / 2, this.drawPos.y + this.radius / 2);
             ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y,
                               controlPoint2.x, controlPoint2.y,
                               lineEndPoint.x, lineEndPoint.y);

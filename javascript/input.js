@@ -1,32 +1,34 @@
 /*****************************************************************************************************************************************
  * WireCoder
  *
- * Output Nodes
+ * Input Nodes
  *
  * Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk231b936d.danm36.koding.io/
  *****************************************************************************************************************************************/
  
-var ConsoleLogNode = (function(_super)
+var PromptNode = (function(_super)
 {
-    __extends(ConsoleLogNode, _super);
-    function ConsoleLogNode(spawnPos)
+    __extends(PromptNode, _super);
+    function PromptNode(spawnPos)
 	{
         _super.call(this, spawnPos);
     }
     
-    ConsoleLogNode.prototype.onCreate = function()
+    PromptNode.prototype.onCreate = function()
     {
-        this.displayName = "console.log()";
+        this.displayName = "prompt()";
         this.inputs.push(new NodePin(this, "In", "flow"));
-        this.inputs.push(new NodePin(this, "To Print", "var"));
+        this.inputs.push(new NodePin(this, "Message", "var"));
+        this.inputs.push(new NodePin(this, "Default Val", "var"));
         this.outputs.push(new NodePin(this, "Out", "flow"));
+        this.outputs.push(new NodePin(this, "Result", "var"));
     }
     
-    ConsoleLogNode.prototype.execute = function()
+    PromptNode.prototype.execute = function()
     {
-        console.log(this.getValue(this.inputs[1]));
+        this.setValue(this.outputs[1], prompt(this.getValue(this.inputs[1]), this.getValue(this.inputs[2])));
         this.outputs[0].fire();   
     }
 	    		
-    return ConsoleLogNode;
+    return PromptNode;
 })(BasicNode);

@@ -27,14 +27,20 @@ function OnResize()
 }
 
 //Draw a polygon of 'N' sides with a center of x and y and a radius of r
-function DrawNPoly(x, y, r, N)
+function DrawNPoly(x, y, r, N, rot)
 {
+    if(rot == undefined)
+        rot = 0;
+    
+    r *= 0.75;
+    
 	ctx.beginPath();
-	ctx.moveTo(x, y - r);
+	ctx.moveTo(x + r * Math.cos(rot - Math.PI / 2 ),
+               y + r * Math.sin(rot - Math.PI / 2 ));
 	for(var n = 0; n < N; n++)
 	{
-		ctx.lineTo(x + r * Math.cos(2 * Math.PI * (n / N) - Math.PI / 2),
-				   y + r * Math.sin(2 * Math.PI * (n / N) - Math.PI / 2));
+		ctx.lineTo(x + r * Math.cos(2 * Math.PI * (n / N) - Math.PI / 2 + rot),
+				   y + r * Math.sin(2 * Math.PI * (n / N) - Math.PI / 2 + rot));
 	}
 	ctx.closePath();
 }
@@ -176,5 +182,38 @@ function ColorLighten(a, alpha)
 	aG = Math.max(Math.min(aG + (255 * alpha), 255), 0);
 	aB = Math.max(Math.min(aB + (255 * alpha), 255), 0);
 	
+	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
+}
+
+function SetOpacity(a, opacity)
+{
+    if(opacity == undefined)
+		opacity = 0.8;
+		
+	var aR = 0, aG = 0, aB = 0, aA = 1;
+				
+	if(a.substr(0, 4) == "rgba")
+	{
+		a = a.substr(4).trim();
+		a = a.substr(1, a.length - 2); //get rid of brackets
+		var aSplit = a.split(",");
+		aR = parseInt(aSplit[0].trim());
+		aG = parseInt(aSplit[1].trim());
+		aB = parseInt(aSplit[2].trim());
+	}
+	else if(a[0] == "#")
+	{
+		a = parseInt(a.substr(1), 16);
+		aR = (a & 0xFF0000) >> 16;
+		aG = (a & 0x00FF00) >> 8;
+		aB = (a & 0x0000FF);
+	}
+	else
+	{
+		return a; //Can't parse color
+	}
+
+    aA = opacity;
+    
 	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
 }

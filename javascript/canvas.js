@@ -106,6 +106,10 @@ function onLoad()
 		{
 			switch(e.which)
 			{
+                case 17: //[ctrl] - Allows node dragging
+                    if(!mouseDown)
+                        ctrlDownOnDrag = true;
+                    break;
                 case 70: //[f] - Reset camera
                     ResetCamera();
                     break;
@@ -120,10 +124,60 @@ function onLoad()
                         }
                     }
 					break;
+                    
+                //Temp
+                
+                case 49:
+                    draggingEl = new BasicNode();
+                    _workspace.push(draggingEl);
+                    break;
+                case 50:
+                    draggingEl = new ConsoleLogNode();
+                    _workspace.push(draggingEl);
+                    break;
+                case 51:
+                    draggingEl = new PromptNode();
+                    _workspace.push(draggingEl);
+                    break;
+                case 52:
+                    _workspace.push(draggingEl);
+                    break;
+                case 53:
+                    _workspace.push(draggingEl);
+                    break;
+                case 54:
+                    _workspace.push(draggingEl);
+                    break;
+                case 55:
+                    _workspace.push(draggingEl);
+                    break;
+                case 56:
+                    _workspace.push(draggingEl);
+                    break;
+                case 57:
+                    _workspace.push(draggingEl);
+                    break;
+                case 48:
+                    mouseDown = true;
+                    ctrlDownOnDrag = true;
+                    draggingEl = new VarNode();
+                    _workspace.push(draggingEl);
+                    break;
 			}
             
             console.log(e.which);
 		});
+        
+        window.addEventListener('keyup', function(e)
+		{
+           switch(e.which)
+           {
+               case 17:
+                   if(!mouseDown)
+                       ctrlDownOnDrag = false;
+                   break; 
+           }
+        });
 		
 		window.addEventListener('resize', OnResize, false); //Because OnResize - like RecalcTree can be used usefully elsewhere
 		
@@ -133,6 +187,7 @@ function onLoad()
 		
 		return true;
 	}
+    
 	Init();
 	Draw();
     
@@ -196,9 +251,9 @@ function Draw()
     }
     
     document.getElementById("canvas").className = "";
-    if(mouseDown)
+    if(mouseDown && !(draggingEl instanceof NodePin))
 		document.getElementById("canvas").className += " cursorDrag";
-    if(hoveringEl !== undefined)
+    if(hoveringEl !== undefined || draggingEl instanceof NodePin)
         document.getElementById("canvas").className += " cursorHover";	
 
 
