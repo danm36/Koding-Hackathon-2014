@@ -16,12 +16,15 @@ var VarNode = (function(_super)
     
     VarNode.prototype.onCreate = function()
     {
-        this.displayName = "Var";
+        this.value = "";
         this.inputs.push(new NodePin(this, "In", "var"));
         this.outputs.push(new NodePin(this, "Out", "var"));
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
-        this.value = "A very long string detailing very long stuff oh yes";
+        this.properties = {
+            value: { type: "string", value: "" },
+            variableName: { type: "string", value: "var" + this.getId() },
+        };
     }
         
     VarNode.prototype.getValue = function(pin)
@@ -34,9 +37,16 @@ var VarNode = (function(_super)
         this.value = value;   
     }
     
+    VarNode.prototype.reset = function()
+    {
+        this.value = this.properties.value.value;   
+    }
+    
     VarNode.prototype.update = function()
     {	      
         this.inputs[0].drawPos = this.outputs[0].drawPos = this.drawPos;
+        
+        this.displayName = this.properties.variableName.value;
         
 		if(draggingEl === undefined)
 		{
@@ -111,7 +121,18 @@ var VarNode = (function(_super)
         
         ctx.font = "8pt Trebuchet MS";
         ctx.fillStyle = "#FFFFFF";
-        var dispValue = this.value.substr(0, Lerp(12, this.value.length, this.hoverTimer));
+        var dispValue = "";
+        
+        if(this.value instanceof Array)
+            dispValue = "Array[" + this.value.length + "]";
+        else if(this.value instanceof Object)
+            dispValue = "Object";
+        else if(this.properties.value.type != "number" && (typeof this.value == "string" || this.value instanceof String))
+            dispValue = "\"" + this.value + "\"";
+        else
+            dispValue = String(this.value);
+        
+        dispValue = dispValue.substr(0, Lerp(12, dispValue.length, this.hoverTimer));
         ctx.fillText(dispValue, this.drawPos.x + this.size.x / 2 - ctx.measureText(dispValue).width / 2 - 1, this.drawPos.y + this.size.y / 2 + 3);
         ctx.fillStyle = "#000000";
         ctx.fillText(dispValue, this.drawPos.x + this.size.x / 2 - ctx.measureText(dispValue).width / 2, this.drawPos.y + this.size.y / 2 + 4);    
@@ -121,3 +142,173 @@ var VarNode = (function(_super)
     
     return VarNode;
 })(BasicNode);
+
+var BoolVarNode = (function(_super)
+{
+    __extends(BoolVarNode, _super);
+    function BoolVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    BoolVarNode.prototype.onCreate = function()
+    {
+        this.value = false;
+        this.inputs.push(new NodePin(this, "In", "bool"));
+        this.outputs.push(new NodePin(this, "Out", "bool"));
+        this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
+        this.outputs[0].isOutput = true;
+        this.properties = {
+            value: { type: "bool", value: false },
+            variableName: { type: "string", value: "bool" + this.getId() },
+        };
+    }
+    
+    BoolVarNode.prototype.getValue = function(pin)
+    {
+        return this.value;
+    }
+    
+    BoolVarNode.prototype.setValue = function(pin, value)
+    {
+        this.value = !!value; 
+    }
+    
+    return BoolVarNode;
+})(VarNode);
+
+var StringVarNode = (function(_super)
+{
+    __extends(StringVarNode, _super);
+    function StringVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    StringVarNode.prototype.onCreate = function()
+    {
+        this.value = false;
+        this.inputs.push(new NodePin(this, "In", "string"));
+        this.outputs.push(new NodePin(this, "Out", "string"));
+        this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
+        this.outputs[0].isOutput = true;
+        this.properties = {
+            value: { type: "string", value: "" },
+            variableName: { type: "string", value: "str" + this.getId() },
+        };
+    }
+    
+    StringVarNode.prototype.getValue = function(pin)
+    {
+        return this.value;
+    }
+    
+    StringVarNode.prototype.setValue = function(pin, value)
+    {
+        this.value = String(value);  
+    }
+    
+    return StringVarNode;
+})(VarNode);
+
+var NumberVarNode = (function(_super)
+{
+    __extends(NumberVarNode, _super);
+    function NumberVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    NumberVarNode.prototype.onCreate = function()
+    {
+        this.value = false;
+        this.inputs.push(new NodePin(this, "In", "number"));
+        this.outputs.push(new NodePin(this, "Out", "number"));
+        this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
+        this.outputs[0].isOutput = true;
+        this.properties = {
+            value: { type: "number", value: 0 },
+            variableName: { type: "string", value: "str" + this.getId() },
+        };
+    }
+    
+    NumberVarNode.prototype.getValue = function(pin)
+    {
+        return this.value;
+    }
+    
+    NumberVarNode.prototype.setValue = function(pin, value)
+    {
+        this.value = parseFloat(value);
+    }
+    
+    return NumberVarNode;
+})(VarNode);
+
+var ObjectVarNode = (function(_super)
+{
+    __extends(ObjectVarNode, _super);
+    function ObjectVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    ObjectVarNode.prototype.onCreate = function()
+    {
+        this.value = false;
+        this.inputs.push(new NodePin(this, "In", "object"));
+        this.outputs.push(new NodePin(this, "Out", "object"));
+        this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
+        this.outputs[0].isOutput = true;
+        this.properties = {
+            value: { type: "object", value: {} },
+            variableName: { type: "string", value: "str" + this.getId() },
+        };
+    }
+    
+    ObjectVarNode.prototype.getValue = function(pin)
+    {
+        return this.value;
+    }
+    
+    ObjectVarNode.prototype.setValue = function(pin, value)
+    {
+        this.value = value;
+    }
+    
+    return ObjectVarNode;
+})(VarNode);
+
+var ArrayVarNode = (function(_super)
+{
+    __extends(ArrayVarNode, _super);
+    function ArrayVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    ArrayVarNode.prototype.onCreate = function()
+    {
+        this.value = false;
+        this.inputs.push(new NodePin(this, "In", "array"));
+        this.outputs.push(new NodePin(this, "Out", "array"));
+        this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
+        this.outputs[0].isOutput = true;
+        this.properties = {
+            value: { type: "array", value: [] },
+            variableName: { type: "string", value: "str" + this.getId() },
+        };
+    }
+    
+    ArrayVarNode.prototype.getValue = function(pin)
+    {
+        return this.value;
+    }
+    
+    ArrayVarNode.prototype.setValue = function(pin, value)
+    {
+        this.value = value;
+    }
+    
+    return ArrayVarNode;
+})(VarNode);

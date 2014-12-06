@@ -17,8 +17,11 @@ var BasicNode = (function()
         this.size = new Vector(128, 64);
         this.inputs = new Array();
         this.outputs = new Array();
-        this.onCreate();
         this.bIsActive = false;
+        this.properties = { };
+        
+        this.onCreate();
+        this.reset();
     }
     
     BasicNode.prototype.onCreate = function()
@@ -56,16 +59,21 @@ var BasicNode = (function()
     BasicNode.prototype.getValue = function(pin)
     {
         if(pin instanceof NodePin && pin.connectee !== undefined)
-            return pin.connectee.parent.getValue(undefined);
+            return pin.connectee.parent.getValue(undefined) || pin.connectee.lastValue;
         return undefined;
     }
     
     BasicNode.prototype.setValue = function(pin, value)
     {
         if(pin instanceof NodePin && pin.connectee !== undefined)
+        {
+            pin.lastValue = value;
             pin.connectee.parent.setValue(undefined, value);
+        }
     }
 		
+    BasicNode.prototype.reset = function() { }
+    
 	BasicNode.prototype.update = function()
     {	
         if(draggingEl === this && ctrlDownOnDrag)
@@ -146,6 +154,12 @@ var BasicNode = (function()
         ctx.fillStyle = this.myFillColor;
         ctx.strokeStyle = styleData.nodeStroke;
         
+        if(selectedEl == this && !mouseDown)
+        {
+            ctx.shadowColor = styleData.nodeSelectionGlow;
+            ctx.shadowBlur = 20;
+        }
+        
         ctx.beginPath();
         ctx.moveTo(this.drawPos.x + 16, this.drawPos.y);
         ctx.lineTo(this.drawPos.x + this.size.x - 16, this.drawPos.y);
@@ -159,6 +173,9 @@ var BasicNode = (function()
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        
+        ctx.shadowBlur = 0;
+        
         ctx.font = "10pt Trebuchet MS";
         ctx.fillStyle = "#000000";
         ctx.fillText(this.displayName, this.drawPos.x + this.size.x / 2 - ctx.measureText(this.displayName).width / 2, this.drawPos.y + 16); 
@@ -185,19 +202,20 @@ var BasicNode = (function()
 
 var NodePin = (function()
 {
-    function NodePin(parent, label, type, otherSupportedTypes)
+    function NodePin(parent, label, type)
 	{
         this.setId(NodePin.sTotalNodes++);
         this.myFillColor = "#000000";
         this.parent = parent;
         this.label = label || "";
-        this.type = type;
+        this.type = type.toLowerCase();
         this.radius = 16;
-        if(!(otherSupportedTypes instanceof Array))
-            otherSupportedTypes = new Array();
-        otherSupportedTypes.push(type);
-        this.supportedTypes = otherSupportedTypes;
         
+        var otherTypes = nodePinTypeSupports[this.type] || new Array();
+        otherTypes.push(type);
+        this.supportedTypes = otherTypes;
+        
+        this.lastValue = undefined;
         this.connectee = undefined;
     }
 

@@ -23,7 +23,62 @@ function ResetCamera(bQuick)
 function OnResize()
 {
 	canvas.width = canvas.offsetWidth;
-	canvas.height = canvas.offsetHeight;
+	canvas.height = window.innerHeight - document.getElementById("drawer").offsetHeight;
+    canvas.style.height = canvas.height + "px";
+}
+
+function SelectNode(node)
+{
+    $("#propArea").empty();
+    if(!(node instanceof BasicNode))
+        return;
+    
+    var toAppend = "<h2>" + node.displayName + "</h2>";
+    toAppend += "<table class='propertyGrid'><tbody>";
+    
+    var bHasProperty = false;
+    for(var prop in node.properties)
+    {
+        bHasProperty = true;
+        switch(node.properties[prop].type.toLowerCase())
+        {
+            default:
+            case "string":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"text\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'string');\" value=\"" + node.properties[prop].value + "\" /></td></tr>";
+                break;
+            case "bool":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"checkbox\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'bool');\" value=\"true\" " + (node.properties[prop].value == true ? "checked" : "") + "/></td></tr>";
+                break;
+            case "number":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"number\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'number');\" value=\"" + node.properties[prop].value + "\" step=\"any\" /></td></tr>";
+                break;
+            case "object":
+                toAppend += "<tr><td>" + prop + "</td><td>Objects not currently handled</td></tr>";
+                break; 
+            case "array":
+                toAppend += "<tr><td>" + prop + "</td><td>Arrays not currently handled</td></tr>";
+                break; 
+        }
+    }
+    
+    if(!bHasProperty)
+        toAppend += "<tr><td colspan=\"2\" style=\"text-align: center; padding: 10px 0px;\">This node has no configurable properties</td></tr>";
+    
+    toAppend += "</tbody></table>";
+    $("#propArea").append(toAppend);
+    
+    selectedEl = node;
+}
+
+function UpdateNodeProp(el, prop, type)
+{
+    if(type == "bool")
+        selectedEl.properties[prop].value = el.checked;
+    else if(type == "number")
+        selectedEl.properties[prop].value = parseFloat(el.value);
+    else
+        selectedEl.properties[prop].value = el.value;
+    selectedEl.reset();
 }
 
 //Draw a polygon of 'N' sides with a center of x and y and a radius of r

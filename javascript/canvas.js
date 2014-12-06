@@ -38,19 +38,21 @@ function onLoad()
 		}
 		
 		mousePosition = new Vector(0, 0);
-		
+		        
 		canvas.addEventListener('mousemove', function(e)
 		{
 			var rect = canvas.getBoundingClientRect();
 			var newMousePosition = new Vector(e.clientX - rect.left, e.clientY - rect.top);
 			
-            if(draggingEl !== undefined)
+            if(mouseDown)
             {
-                
-            }
-            else
-            {
-                if(mouseDown)
+                if(selectedEl !== undefined && mouseDownPosition.Subtract(newMousePosition).LengthSquared() > 64)
+                {
+                    draggingEl = selectedEl;
+                    selectedEl = undefined;
+                }
+            
+                if(selectedEl === undefined && draggingEl === undefined)
                 {
                     actualPanPosition = actualPanPosition.Subtract(actualMousePosition.Subtract(newMousePosition));
 				    targetPanPosition = actualPanPosition.Copy();
@@ -61,22 +63,40 @@ function onLoad()
             mousePosition = actualMousePosition.Subtract(actualPanPosition).Divide(actualZoomLevel);
 		});
 		
+        window.addEventListener('mousedown', function(e)
+        {
+            lastMouseDownElement = e.target;
+        });
+        
 		canvas.addEventListener('mousedown', function(e)
 		{
+            var rect = canvas.getBoundingClientRect();
+			mouseDownPosition = new Vector(e.clientX - rect.left, e.clientY - rect.top);       
 			mouseDown = true;
-            
+                      
+            selectedEl = undefined;
             if(hoveringEl !== undefined)
             {
-                draggingEl = hoveringEl;
+                selectedEl = hoveringEl;
                 hoveringEl = undefined;
-                if(draggingEl.onMouseDown !== undefined)
-                    draggingEl.onMouseDown();
+                if(selectedEl.onMouseDown !== undefined)
+                    selectedEl.onMouseDown();
+            }
+            
+            if(ctrlDownOnDrag)
+            {
+                draggingEl = selectedEl;
+                selectedEl = undefined;
             }
 		});
 		
 		canvas.addEventListener('mouseup', function(e)
 		{				
 			mouseDown = false;
+            
+            if(selectedEl instanceof NodePin)
+                selectedEl = selectedEl.parent;
+            SelectNode(selectedEl);
             
             if(draggingEl !== undefined)
             {
@@ -104,11 +124,20 @@ function onLoad()
 		
 		window.addEventListener('keydown', function(e)
 		{
+            if(lastMouseDownElement !== canvas)
+                return;
+            
 			switch(e.which)
 			{
                 case 17: //[ctrl] - Allows node dragging
                     if(!mouseDown)
                         ctrlDownOnDrag = true;
+                    break;
+                case 46: //[del] - Delete selected node
+                    var index = _workspace.indexOf(selectedEl);
+                    if(index >= 0)
+                        _workspace.splice(index, 1);
+                    selectedEl = undefined;
                     break;
                 case 70: //[f] - Reset camera
                     ResetCamera();
@@ -116,11 +145,11 @@ function onLoad()
 				case 82: //[r] - Run simulation
                     for(var i = 0; i < _workspace.length; i++)
                     {
+                        _workspace[i].reset();
                         if(_workspace[i] instanceof MainFunctionNode)
                         {
                             _workspace[i].bIsActive = true;
                             _workspace[i].fire();
-                            break;
                         }
                     }
 					break;
@@ -128,22 +157,29 @@ function onLoad()
                 //Temp
                 
                 case 49:
-                    draggingEl = new BasicNode();
-                    _workspace.push(draggingEl);
+                    var newNode = new BasicNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
                 case 50:
-                    draggingEl = new ConsoleLogNode();
-                    _workspace.push(draggingEl);
+                    var newNode = new ConsoleLogNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
                 case 51:
-                    draggingEl = new PromptNode();
-                    _workspace.push(draggingEl);
+                    var newNode = new PromptNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
                 case 52:
-                    _workspace.push(draggingEl);
+                    var newNode = new IfNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
                 case 53:
-                    _workspace.push(draggingEl);
+                    var newNode = new EndIfNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
                 case 54:
                     _workspace.push(draggingEl);
@@ -158,10 +194,9 @@ function onLoad()
                     _workspace.push(draggingEl);
                     break;
                 case 48:
-                    mouseDown = true;
-                    ctrlDownOnDrag = true;
-                    draggingEl = new VarNode();
-                    _workspace.push(draggingEl);
+                    var newNode = new VarNode(actualPanPosition.Multiply(-1));
+                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
+                    _workspace.push(newNode);
                     break;
 			}
             
@@ -193,8 +228,15 @@ function onLoad()
     
     _workspace.push(new MainFunctionNode());
     _workspace.push(new BasicNode(new Vector(256, 0)));
-    _workspace.push(new BasicNode(new Vector(512, 0)));         
-    _workspace.push(new ConsoleLogNode(new Vector(256, 128)));         
+    _workspace.push(new BasicNode(new Vector(512, 0)));     
+    _workspace.push(new PromptNode(new Vector(256, 128)));  
+    _workspace.push(new ConsoleLogNode(new Vector(512, 128)));
+    _workspace.push(new VarNode(new Vector(256, 256)));
+    _workspace.push(new BoolVarNode(new Vector(352, 256)));
+    _workspace.push(new StringVarNode(new Vector(448, 256)));
+    _workspace.push(new NumberVarNode(new Vector(544, 256)));
+    _workspace.push(new ObjectVarNode(new Vector(640, 256)));
+    _workspace.push(new ArrayVarNode(new Vector(736, 256)));
 }
 
 function Draw()
@@ -241,6 +283,12 @@ function Draw()
     
     for(var i = 0; i < _workspace.length; i++) //Initial draw
     {
+        if(_workspace[i] === undefined)
+        {
+            _workspace.splice(i, 1);
+            i--;
+            continue;
+        }
         _workspace[i].update();
         _workspace[i].draw();
     }

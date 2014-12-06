@@ -14,7 +14,9 @@ var _workspace = new Array();
 
 var mousePosition;
 var actualMousePosition;
+var mouseDownPosition;
 var mouseDown = false;
+var lastMouseDownElement = undefined;
 var ctrlDownOnDrag = false;
 
 var targetPanPosition = new Vector(0, 0);
@@ -39,16 +41,28 @@ var styleData = {
     nodeStroke: "#000000",
 	nodeFill: "#FFFFFF",
 	nodeFillActive: "#FF9900",
+    nodeSelectionGlow: "#6666FF",
     
     pinFillColor: {
         flow: "#000000",
         var: "#FF00FF",
-        string: "#00FF00",
+        bool: "#FFAA00",
+        string: "#00CC00",
         number: "#0000FF",
         object: "#FFFF00",
         array: "#00FFFF",
     }
 };
 
+var nodePinTypeSupports = {
+    var: ["string", "number", "bool", "object", "array"],
+    string: ["number", "bool", "var"],
+    bool: ["var"],
+    number: ["var"],
+    object: ["var"],
+    array: ["var"]
+}
+
 var hoveringEl = undefined;
 var draggingEl = undefined;
+var selectedEl = undefined;

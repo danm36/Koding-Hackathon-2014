@@ -11,7 +11,8 @@ body
 	margin: 0px;
 	height: 100%;
 	overflow: hidden;
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;	
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 12px;
 }
 
 canvas
@@ -23,7 +24,7 @@ canvas
 	bottom: 0px;
 	left: 0px;
 	width: 100vw;
-	height: 100vh;
+	height: 512px;
 }
 
 canvas.cursorHover
@@ -34,4 +35,164 @@ canvas.cursorHover
 canvas.cursorDrag
 {
 	cursor: move;	
+}
+
+#drawer
+{
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 100%;
+    max-height: 256px;
+    box-shadow: 0px -4px 8px #B2B2B2;
+    border-top: 1px solid #929292;
+}
+
+#drawer > div
+{
+    box-sizing: border-box;
+    display: inline-block;
+    margin: -2px;
+}
+
+#mainArea
+{
+    width: 75%;
+    height: 100%;
+}
+
+#tabs
+{
+    background: #D7D7D7;
+    padding-left: 8px;
+    margin: 2px;
+    border-bottom: 1px solid #929292;
+}
+
+#tabs span
+{
+    display: inline-block;
+    padding: 2px 9px;
+    margin: 0px -2px;
+    cursor: pointer;
+}
+
+#tabs span.active
+{
+    padding: 2px 8px;
+    background: linear-gradient(to bottom, #D7D7D7 0%, #BBBBBB 50%, #D7D7D7 100%);
+    border-right: 1px solid #929292;
+    border-left: 1px solid #929292;
+}
+
+#drawerContent
+{
+    max-height: 236px;
+    overflow: auto;
+}
+
+#drawerContent > div
+{
+    display: none;
+    padding: 4px;
+}
+
+#drawerContent > div.active
+{
+    display: block;
+}
+
+#drawerContent .logRow
+{
+    padding-left: 16px;
+    font-family: monospace;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+#drawerContent .logRow:hover
+{
+    background: #ECECEC;
+}
+
+#drawerContent #console
+{
+    overflow-y: auto;
+}
+
+#drawerContent #console #consoleInputContainer
+{
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+#drawerContent #console #consoleInputIndicator
+{
+    color: #0044FF;
+    padding: 0px 8px;
+    display: inline-block;
+}
+
+#drawerContent #console #consoleInput
+{
+    border: none;
+    width: 100%;
+    font-family: monospace;
+    padding: 2px;
+}
+
+#properties
+{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+    width: 25.5%;
+    border-left: 1px solid #929292
+}
+
+#properties h1
+{
+    background: #D7D7D7;
+    padding: 1px;
+    margin: 2px;
+    margin-left: 0px;
+    border-bottom: 1px solid #929292;
+    font-size: 14px;
+    text-align: center;
+}
+
+#properties h2
+{
+    padding-left: 8px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+#properties table
+{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4px;
+}
+
+#properties table tr td
+{
+    background: #F0F0F0;
+    border: 1px solid #E0E0E0;
+}
+
+#properties table tr:hover td
+{
+    background: #E5E5E5;
+}
+
+#properties table tr td:first-of-type
+{
+    padding-left: 4px;
+}
+
+#properties table tr td input
+{
+    width: 96%;
 }

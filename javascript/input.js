@@ -18,15 +18,20 @@ var PromptNode = (function(_super)
     {
         this.displayName = "prompt()";
         this.inputs.push(new NodePin(this, "In", "flow"));
-        this.inputs.push(new NodePin(this, "Message", "var"));
-        this.inputs.push(new NodePin(this, "Default Val", "var"));
+        this.inputs.push(new NodePin(this, "Message", "string"));
+        this.inputs.push(new NodePin(this, "Default Val", "string"));
         this.outputs.push(new NodePin(this, "Out", "flow"));
-        this.outputs.push(new NodePin(this, "Result", "var"));
+        this.outputs.push(new NodePin(this, "Result", "string"));
+        
+        this.properties = {
+            message: { type: "string", value: "Enter a value" },
+            defaultval: { type: "string", value: "" },
+        };
     }
     
     PromptNode.prototype.execute = function()
     {
-        this.setValue(this.outputs[1], prompt(this.getValue(this.inputs[1]), this.getValue(this.inputs[2])));
+        this.setValue(this.outputs[1], prompt(this.getValue(this.inputs[1]) || this.properties.message.value, this.getValue(this.inputs[2]) || this.properties.defaultval.value));
         this.outputs[0].fire();   
     }
 	    		

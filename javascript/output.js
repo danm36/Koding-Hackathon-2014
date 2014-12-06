@@ -18,13 +18,17 @@ var ConsoleLogNode = (function(_super)
     {
         this.displayName = "console.log()";
         this.inputs.push(new NodePin(this, "In", "flow"));
-        this.inputs.push(new NodePin(this, "To Print", "var"));
+        this.inputs.push(new NodePin(this, "To Print", "string"));
         this.outputs.push(new NodePin(this, "Out", "flow"));
+        
+        this.properties = {
+            output: { type: "string", value: "" },
+        };
     }
     
     ConsoleLogNode.prototype.execute = function()
     {
-        console.log(this.getValue(this.inputs[1]));
+        console.log(this.getValue(this.inputs[1]) || this.properties.output.value);
         this.outputs[0].fire();   
     }
 	    		
