@@ -1,0 +1,37 @@
+/*****************************************************************************************************************************************
+ * WireCoder
+ *
+ * CSS
+ *
+ * Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk231b936d.danm36.koding.io/
+ *****************************************************************************************************************************************/
+
+body
+{
+	margin: 0px;
+	height: 100%;
+	overflow: hidden;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;	
+}
+
+canvas
+{
+	cursor: default;
+	position: fixed;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	width: 100vw;
+	height: 100vh;
+}
+
+canvas.cursorHover
+{
+	cursor: pointer;	
+}
+
+canvas.cursorDrag
+{
+	cursor: move;	
+}
