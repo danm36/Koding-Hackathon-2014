@@ -38,6 +38,10 @@ var styleData = {
     nodeStroke: "#000000",
 	nodeFill: "#FFFFFF",
 	nodeFillActive: "#FF9900",
+    
+    pinFillColor: {
+        flow: "#000000",
+    }
 };
 
 var hoveringEl = undefined;

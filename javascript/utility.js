@@ -9,7 +9,7 @@
 //Resets the camera position and zoom. If bQuick is true, doesn't animate the transition
 function ResetCamera(bQuick)
 {
-	targetPanPosition = new Vector(canvas.width / 2, 128);
+	targetPanPosition = new Vector(128, 128);
 	targetZoomLevel = 1;
 	
 	if(bQuick === true)
@@ -137,6 +137,44 @@ function ColorDarken(a, alpha)
 	aR = Math.max(Math.min(aR * alpha, 255), 0);
 	aG = Math.max(Math.min(aG * alpha, 255), 0);
 	aB = Math.max(Math.min(aB * alpha, 255), 0);
+	
+	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
+}
+
+//Lightens the supplied amount by [alpha] percentage
+function ColorLighten(a, alpha)
+{
+	if(alpha == undefined)
+		alpha = 0.2;
+		
+	var aR = 0, aG = 0, aB = 0, aA = 1;
+				
+	if(a.substr(0, 4) == "rgba")
+	{
+		a = a.substr(4).trim();
+		a = a.substr(1, a.length - 2); //get rid of brackets
+		var aSplit = a.split(",");
+		aR = parseInt(aSplit[0].trim());
+		aG = parseInt(aSplit[1].trim());
+		aB = parseInt(aSplit[2].trim());
+		aA = parseFloat(aSplit[3].trim());
+	}
+	else if(a[0] == "#")
+	{
+		a = parseInt(a.substr(1), 16);
+		aR = (a & 0xFF0000) >> 16;
+		aG = (a & 0x00FF00) >> 8;
+		aB = (a & 0x0000FF);
+		aA = 1;
+	}
+	else
+	{
+		return a; //Can't parse color
+	}
+	
+	aR = Math.max(Math.min(aR + (255 * alpha), 255), 0);
+	aG = Math.max(Math.min(aG + (255 * alpha), 255), 0);
+	aB = Math.max(Math.min(aB + (255 * alpha), 255), 0);
 	
 	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
 }

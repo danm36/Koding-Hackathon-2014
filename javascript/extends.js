@@ -1,9 +1,9 @@
 /*****************************************************************************************************************************************
- * Fault Tree Viewer for 08240 ACW 2014
+ * WireCoder
  *
- * Extends helper file
+ * Extends functionality
  *
- * Untouched
+ * Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk231b936d.danm36.koding.io/
  *****************************************************************************************************************************************/
 
 

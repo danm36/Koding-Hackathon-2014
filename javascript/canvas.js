@@ -69,6 +69,8 @@ function onLoad()
             {
                 draggingEl = hoveringEl;
                 hoveringEl = undefined;
+                if(draggingEl.onMouseDown !== undefined)
+                    draggingEl.onMouseDown();
             }
 		});
 		
@@ -77,7 +79,11 @@ function onLoad()
 			mouseDown = false;
             
             if(draggingEl !== undefined)
+            {
+                if(draggingEl.onMouseUp !== undefined)
+                    draggingEl.onMouseUp();
                 draggingEl = undefined;
+            }
 		});
 		
 		canvas.addEventListener("mousewheel", function(e)
@@ -98,11 +104,25 @@ function onLoad()
 		
 		window.addEventListener('keydown', function(e)
 		{
-			/* switch(e.which)
+			switch(e.which)
 			{
-				case 187: //[+]
+                case 70: //[f] - Reset camera
+                    ResetCamera();
+                    break;
+				case 82: //[r] - Run simulation
+                    for(var i = 0; i < _workspace.length; i++)
+                    {
+                        if(_workspace[i] instanceof MainFunctionNode)
+                        {
+                            _workspace[i].bIsActive = true;
+                            _workspace[i].fire();
+                            break;
+                        }
+                    }
 					break;
-			}*/
+			}
+            
+            console.log(e.which);
 		});
 		
 		window.addEventListener('resize', OnResize, false); //Because OnResize - like RecalcTree can be used usefully elsewhere
@@ -116,9 +136,10 @@ function onLoad()
 	Init();
 	Draw();
     
-    _workspace.push(new BasicNode());
+    _workspace.push(new MainFunctionNode());
     _workspace.push(new BasicNode(new Vector(256, 0)));
-    _workspace.push(new BasicNode(new Vector(256, 256)));                
+    _workspace.push(new BasicNode(new Vector(512, 0)));         
+    _workspace.push(new ConsoleLogNode(new Vector(256, 128)));         
 }
 
 function Draw()
@@ -163,10 +184,15 @@ function Draw()
 	ctx.scale(actualZoomLevel, actualZoomLevel);
 	
     
-    for(var i = 0; i < _workspace.length; i++)
+    for(var i = 0; i < _workspace.length; i++) //Initial draw
     {
         _workspace[i].update();
         _workspace[i].draw();
+    }
+    
+    for(var i = 0; i < _workspace.length; i++) //Lines connecting pins
+    {
+        _workspace[i].drawConnectingLines();
     }
     
     document.getElementById("canvas").className = "";
