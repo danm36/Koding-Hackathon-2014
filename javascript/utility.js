@@ -39,7 +39,8 @@ function RunSimulation()
     var playFromNode = _breakpointNode;
     for(var i = 0; i < _workspace.length; i++)
     {
-        _workspace[i].reset();
+        if(_breakpointNode !== undefined)
+            _workspace[i].reset();
         _workspace[i].bIsActive = false;
         if(_breakpointNode === undefined && _workspace[i] instanceof MainFunctionNode)
             playFromNode = _workspace[i];
@@ -137,15 +138,38 @@ function DeleteNode(el)
     {
         SelectNode(undefined);
         
-        for(var i = 0; i < el.inputs.length; i++)
+        if(el instanceof VarNode)
         {
-            if(el.inputs[i].connectee !== undefined)
-                el.inputs[i].connectee = el.inputs[i].connectee.connectee = undefined;
+            for(var i = 0; i < _workspace.length; i++)
+            {
+                for(var j = 0; j < _workspace[i].inputs.length; j++)
+                {
+                    if(_workspace[i].inputs[j].connectee !== undefined && _workspace[i].inputs[j].connectee.parent === el)
+                    {
+                        _workspace[i].inputs[j].connectee = undefined;
+                    }
+                }
+                for(var j = 0; j < _workspace[i].outputs.length; j++)
+                {
+                    if(_workspace[i].outputs[j].connectee !== undefined && _workspace[i].outputs[j].connectee.parent === el)
+                    {
+                        _workspace[i].outputs[j].connectee = undefined;
+                    }
+                }
+            }
         }
-        for(var i = 0; i < el.outputs.length; i++)
+        else
         {
-            if(el.outputs[i].connectee !== undefined)
-                el.outputs[i].connectee = el.outputs[i].connectee.connectee = undefined;
+            for(var i = 0; i < el.inputs.length; i++)
+            {
+                if(el.inputs[i].connectee !== undefined)
+                    el.inputs[i].connectee = el.inputs[i].connectee.connectee = undefined;
+            }
+            for(var i = 0; i < el.outputs.length; i++)
+            {
+                if(el.outputs[i].connectee !== undefined)
+                    el.outputs[i].connectee = el.outputs[i].connectee.connectee = undefined;
+            }
         }
         
         el.onDelete();
@@ -355,4 +379,18 @@ function SetOpacity(a, opacity)
     aA = opacity;
     
 	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
+}
+
+String.prototype.padLeft = function(len, chr)
+{
+    var str = this, chr = chr || " ", len = len || 0;
+    while(str.length < len) str = chr + str;
+    return str;
+}
+
+String.prototype.addLeft = function(len, chr)
+{
+    var str = this, chr = chr || " ", len = len || 0;
+    for(var i = 0; i < len; i++) str = chr + str;
+    return str;
 }

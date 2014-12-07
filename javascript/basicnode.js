@@ -136,6 +136,11 @@ var BasicNode = (function()
         return false;
     }
     
+    BasicNode.prototype.getCodeString = function()
+    {
+        return [{code: this.bIsBreakpoint ? "/* TriggerBreakpoint */" : "/* " + this.constructor.name + " is missing code string */" }].concat(this.outputs[0].getCodeString());   
+    }
+    
 	BasicNode.prototype.update = function()
     {	
         if(!(this instanceof VarNode))
@@ -394,7 +399,15 @@ var NodePin = (function()
             }
         }
     }
-		
+    
+    NodePin.prototype.getCodeString = function()
+    {
+        if(this.connectee !== undefined)
+            return this.connectee.parent.getCodeString();
+        
+        return undefined;
+    }
+    
     NodePin.prototype.fire = function()
     {
         if(this.isOutput)
@@ -406,9 +419,14 @@ var NodePin = (function()
             else
             {
                 if(CallFunctionNode.waitStack.length > 0)
+                {
                     CallFunctionNode.waitStack.pop().execute(true);
+                }
                 else
-                    _WCState = 0;   
+                {
+                    console.info("Program simulation terminated");
+                    _WCState = 0;  
+                }
                 
             }
             this.parent.bIsActive = false;

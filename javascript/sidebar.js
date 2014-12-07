@@ -49,6 +49,7 @@ var sidebar = {
                     var newEl = new window[this.categories[cat].nodes[i].node]();
                     _workspace.push(newEl);
                     ctrlDownOnDrag = true;
+                    selectedEl = undefined;
                     draggingEl = newEl;
                 }
             } 

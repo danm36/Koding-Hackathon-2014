@@ -59,6 +59,11 @@ var FunctionNode = (function(_super)
         
         this.outputs[0].fire();
     }
+    
+    FunctionNode.prototype.getCodeString = function()
+    {
+        return [{ code: "function " + this.properties.name.value + "(params)", indent: true }].concat(this.outputs[0].getCodeString());   
+    }
 	    		
     return FunctionNode;
 })(BasicNode);
@@ -86,6 +91,11 @@ var MainFunctionNode = (function(_super)
         }, _playbackSpeed);
     }
  
+    MainFunctionNode.prototype.getCodeString = function()
+    {
+        return [{ code: "function Main()", indent: true }].concat(this.outputs[0].getCodeString());   
+    }
+    
     return MainFunctionNode;
 })(BasicNode);
 
@@ -171,6 +181,23 @@ var CallFunctionNode = (function(_super)
         
         this.myFunc.fire(params);
         CallFunctionNode.waitStack.push(this);
+    }
+    
+    CallFunctionNode.prototype.getCodeString = function()
+    {
+        var params = "";
+        if(this.inputs.length > 1)
+        {
+            var params = "[";
+            for(var i = 1; i < this.inputs.length; i++)
+            {
+                var cs = this.inputs[i].getCodeString();
+                if(cs !== undefined && cs.code !== undefined)
+                    params += (i != 1 ? ", " : "") + cs.code;
+            }
+            params += "]";
+        }
+        return [{ code: this.properties.toCall.value + "(" + params + ");" }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return CallFunctionNode;

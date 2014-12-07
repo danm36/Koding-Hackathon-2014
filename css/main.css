@@ -159,6 +159,12 @@ canvas.cursorDrag
     content: " (!) ";   
 }
 
+#codeRefreshBtn
+{
+    float: right;
+    margin-top: -4px;
+}
+
 #properties
 {
     position: absolute;

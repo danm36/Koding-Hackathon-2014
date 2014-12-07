@@ -24,8 +24,9 @@ var VarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "string", value: "" },
-            variableName: { type: "string", value: "var" + this.getId() },
+            value: { type: "string", value: "", tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "var" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
         
@@ -36,12 +37,32 @@ var VarNode = (function(_super)
     
     VarNode.prototype.setValue = function(pin, value)
     {
-        this.value = value;   
+        if(this.properties.isConst !== true)
+            this.value = value;
+        else
+            this.curError = "Cannot set a constant value";
     }
     
     VarNode.prototype.reset = function()
     {
+        this.curError = undefined;
         this.value = this.properties.value.value;   
+    }
+    
+    VarNode.prototype.getCodeString = function()
+    {
+        if(this.properties.isConst.value === true)
+        {
+            if(this.value instanceof Array)
+                return [{code: "Array[" + this.value.length + "]"}];
+            else if(this.value instanceof Object)
+                return [{code: "Object"}];
+            else if(this.properties.value.type != "number" && (typeof this.value == "string" || this.value instanceof String))
+                return [{code: "\"" + this.properties.value.value + "\""}];
+            else
+                return [{code: String(this.properties.value.value)}];
+        }
+        return [{code: (this.properties.variableName.value.trim() != "" ? this.properties.variableName.value.trim() : this.type + this.getId()) }];   
     }
     
     VarNode.prototype.update = function()
@@ -162,8 +183,9 @@ var BoolVarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "bool", value: false },
-            variableName: { type: "string", value: "bool" + this.getId() },
+            value: { type: "bool", value: false, tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "bool" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
     
@@ -198,8 +220,9 @@ var StringVarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "string", value: "" },
-            variableName: { type: "string", value: "str" + this.getId() },
+            value: { type: "string", value: "", tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "str" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
     
@@ -234,8 +257,9 @@ var NumberVarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "number", value: 0 },
-            variableName: { type: "string", value: "str" + this.getId() },
+            value: { type: "number", value: 0, tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "num" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
     
@@ -270,8 +294,9 @@ var ObjectVarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "object", value: {} },
-            variableName: { type: "string", value: "str" + this.getId() },
+            value: { type: "object", value: {}, tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "obj" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
     
@@ -306,8 +331,9 @@ var ArrayVarNode = (function(_super)
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
-            value: { type: "array", value: [] },
-            variableName: { type: "string", value: "str" + this.getId() },
+            value: { type: "array", value: [], tip: "The initial value of the variable when the code first runs" },
+            variableName: { type: "string", value: "arr" + this.getId(), tip: "The name of the variable" },
+            isConst: { type: "bool", value: false, tip: "If true, this variable is replaced with its value in code output. Cannot be set by code." },
         };
     }
     

@@ -33,6 +33,24 @@ var ConfirmNode = (function(_super)
         this.setValue(this.outputs[1], confirm(this.getValue(this.inputs[1]) || this.properties.message.value));
         this.outputs[0].fire();   
     }
+    
+    ConfirmNode.prototype.getCodeString = function()
+    {
+        var finalCode = "confirm(";
+        
+        var val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = '"' + this.properties.message.value + '"';
+        else
+            val = val[0].code;        
+        finalCode += val + ");";
+        
+        val = this.outputs[1].getCodeString();
+        if(val !== undefined)
+            finalCode = val[0].code + " = " + finalCode;
+        
+        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
+    }
 	    		
     return ConfirmNode;
 })(BasicNode);
@@ -65,6 +83,31 @@ var PromptNode = (function(_super)
     {
         this.setValue(this.outputs[1], prompt(this.getValue(this.inputs[1]) || this.properties.message.value, this.getValue(this.inputs[2]) || this.properties.defaultval.value));
         this.outputs[0].fire();   
+    }
+    
+    PromptNode.prototype.getCodeString = function()
+    {
+        var finalCode = "prompt(";
+        
+        var val = this.inputs[1].getCodeString();
+        if(val == undefined)
+            val = '"' + this.properties.message.value + '"';
+        else
+            val = val.code;        
+        finalCode += val + ", "; 
+        
+        val = this.inputs[2].getCodeString();
+        if(val === undefined)
+            val = '"' + this.properties.message.value + '"';
+        else
+            val = val[0].code;        
+        finalCode += val + ");";
+        
+        val = this.outputs[1].getCodeString();
+        if(val !== undefined)
+            finalCode = val[0].code + " = " + finalCode;
+        
+        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return PromptNode;

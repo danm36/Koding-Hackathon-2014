@@ -32,6 +32,20 @@ var ConsoleLogNode = (function(_super)
         console.log(this.getValue(this.inputs[1]) || this.properties.output.value);
         this.outputs[0].fire();   
     }
+    
+    ConsoleLogNode.prototype.getCodeString = function()
+    {
+        var finalCode = "console.log(";
+        
+        var val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = '"' + this.properties.output.value + '"';
+        else
+            val = val[0].code;        
+        finalCode += val + ");";
+        
+        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
+    }
 	    		
     return ConsoleLogNode;
 })(BasicNode);

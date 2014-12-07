@@ -204,3 +204,52 @@ function CheckForNewErrors()
     lastErrors = curErrors;
     curErrors = [];
 }
+
+function RefreshCode()
+{
+    if(lastErrors.length > 0)
+    {
+        console.warn("Failed to generate code - There are some errors present");
+        return;
+    }
+    
+    $("#generatedCode #codeOutput").empty();
+    var toAppend = "";
+    var indentLevel = 0;
+    for(var n = 0; n < _workspace.length; n++)
+    {
+        if(_workspace[n] instanceof MainFunctionNode || _workspace[n] instanceof FunctionNode)
+        {
+            var cs = _workspace[n].getCodeString();
+            for(var i = 0; i < cs.length; i++)
+            {
+                if(cs[i] === undefined)
+                    break;
+                
+                if(cs[i].code !== undefined)
+                    toAppend += "<div class=\"logRow\">" + cs[i].code.addLeft(indentLevel * 4, "&nbsp;") + "</div>";
+                
+                if(cs[i].indent === true)
+                {                
+                    toAppend += "<div class=\"logRow\">" + "{".addLeft(indentLevel * 4, "&nbsp;") + "</div>";
+                    indentLevel++;
+                }
+                else if(cs[i].exdent === true)
+                {
+                    indentLevel--;
+                    toAppend += "<div class=\"logRow\">" + "}".addLeft(indentLevel * 4, "&nbsp;") + "</div>";                 
+                }
+            }
+            
+            while(indentLevel > 0)
+            {
+                indentLevel--;
+                toAppend += "<div class=\"logRow\">" + "}".addLeft(indentLevel * 4, "&nbsp;") + "</div>";    
+            }
+            toAppend += "<div class=\"logRow\">&nbsp;</div>"; 
+        }
+    }
+    
+    
+    $("#generatedCode #codeOutput").append(toAppend);
+}
