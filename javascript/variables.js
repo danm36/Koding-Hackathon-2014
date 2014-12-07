@@ -112,12 +112,18 @@ var VarNode = (function(_super)
         ctx.fillStyle = this.myFillColor;
         ctx.strokeStyle = styleData.pinFillColor[this.outputs[0].type] || "#000000";
         
+        if(selectedEl == this && !mouseDown)
+        {
+            ctx.shadowColor = styleData.nodeSelectionGlow;
+            ctx.shadowBlur = 20;
+        }
         ctx.beginPath();
         ctx.moveTo(this.drawPos.x + this.size.x, this.drawPos.y + this.size.y / 2);
         ctx.arc(this.drawPos.x + this.size.x / 2, this.drawPos.y + this.size.y / 2, this.size.x / 2, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        ctx.shadowBlur = 0;
         
         
         ctx.font = "8pt Trebuchet MS";
