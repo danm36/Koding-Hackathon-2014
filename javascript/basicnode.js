@@ -241,7 +241,7 @@ var NodePin = (function()
                 {
                     for(var j = 0; j < _workspace[i].inputs.length; j++)
                     {
-                        if( this.supportedTypes.indexOf(_workspace[i].inputs[j].type) >= 0 &&
+                        if( _workspace[i].inputs[j].supportedTypes.indexOf(this.type) >= 0 &&
                             mousePosition.x > _workspace[i].inputs[j].drawPos.x &&
                             mousePosition.y > _workspace[i].inputs[j].drawPos.y &&
                             mousePosition.x < _workspace[i].inputs[j].drawPos.x + _workspace[i].inputs[j].radius &&
@@ -259,7 +259,7 @@ var NodePin = (function()
                 {
                     for(var j = 0; j < _workspace[i].outputs.length; j++)
                     {                        
-                        if( _workspace[i].outputs[j].supportedTypes.indexOf(this.type) >= 0 &&
+                        if( this.supportedTypes.indexOf(_workspace[i].outputs[j].type) >= 0 &&
                             mousePosition.x > _workspace[i].outputs[j].drawPos.x &&
                             mousePosition.y > _workspace[i].outputs[j].drawPos.y &&
                             mousePosition.x < _workspace[i].outputs[j].drawPos.x + _workspace[i].outputs[j].radius &&

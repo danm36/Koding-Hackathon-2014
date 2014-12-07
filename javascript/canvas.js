@@ -227,7 +227,7 @@ function onLoad()
                     break;
 			}
             
-            console.log(e.which);
+            //console.log(e.which);
 		});
         
         window.addEventListener('keyup', function(e)
