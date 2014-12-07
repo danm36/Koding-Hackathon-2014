@@ -259,7 +259,8 @@ var NodePin = (function()
                 {
                     for(var j = 0; j < _workspace[i].outputs.length; j++)
                     {                        
-                        if( mousePosition.x > _workspace[i].outputs[j].drawPos.x &&
+                        if( _workspace[i].outputs[j].supportedTypes.indexOf(this.type) >= 0 &&
+                            mousePosition.x > _workspace[i].outputs[j].drawPos.x &&
                             mousePosition.y > _workspace[i].outputs[j].drawPos.y &&
                             mousePosition.x < _workspace[i].outputs[j].drawPos.x + _workspace[i].outputs[j].radius &&
                             mousePosition.y < _workspace[i].outputs[j].drawPos.y + _workspace[i].outputs[j].radius)
