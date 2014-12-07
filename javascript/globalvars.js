@@ -10,11 +10,11 @@ var canvas;
 var ctx;
 
 var _WCState = 0;
-var _workspace = new Array();
+var _workspace = [];
 
-var mousePosition;
-var actualMousePosition;
-var mouseDownPosition;
+var mousePosition = new Vector(0, 0);
+var actualMousePosition = new Vector(0, 0);
+var mouseDownPosition = new Vector(0, 0);
 var mouseDown = false;
 var lastMouseDownElement = undefined;
 var ctrlDownOnDrag = false;
@@ -51,7 +51,9 @@ var styleData = {
         number: "#0000FF",
         object: "#FFFF00",
         array: "#00FFFF",
-    }
+    },
+    
+    sidebarBG: "#000000",
 };
 
 var nodePinTypeSupports = {

@@ -9,6 +9,7 @@
 var VarNode = (function(_super)
 {
     __extends(VarNode, _super);
+    sidebar.AddToSidebar("VarNode", "var", "Variables");
     function VarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -146,6 +147,7 @@ var VarNode = (function(_super)
 var BoolVarNode = (function(_super)
 {
     __extends(BoolVarNode, _super);
+    sidebar.AddToSidebar("BoolVarNode", "Boolean", "Variables");
     function BoolVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -214,6 +216,7 @@ var StringVarNode = (function(_super)
 var NumberVarNode = (function(_super)
 {
     __extends(NumberVarNode, _super);
+    sidebar.AddToSidebar("NumberVarNode", "Number", "Variables");
     function NumberVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -248,6 +251,7 @@ var NumberVarNode = (function(_super)
 var ObjectVarNode = (function(_super)
 {
     __extends(ObjectVarNode, _super);
+    sidebar.AddToSidebar("ObjectVarNode", "Object", "Variables");
     function ObjectVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -282,6 +286,7 @@ var ObjectVarNode = (function(_super)
 var ArrayVarNode = (function(_super)
 {
     __extends(ArrayVarNode, _super);
+    sidebar.AddToSidebar("ArrayVarNode", "Array", "Variables");
     function ArrayVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);

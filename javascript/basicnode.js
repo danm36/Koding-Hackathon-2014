@@ -8,6 +8,7 @@
  
 var BasicNode = (function()
 {
+    sidebar.AddToSidebar("BasicNode", "Relay", "Basic");
     function BasicNode(spawnPos)
 	{
         this.setId(BasicNode.sTotalNodes++);
@@ -21,7 +22,7 @@ var BasicNode = (function()
         this.properties = { };
         
         this.onCreate();
-        this.reset();
+        this.reset(); 
     }
     
     BasicNode.prototype.onCreate = function()
@@ -161,15 +162,7 @@ var BasicNode = (function()
         }
         
         ctx.beginPath();
-        ctx.moveTo(this.drawPos.x + 16, this.drawPos.y);
-        ctx.lineTo(this.drawPos.x + this.size.x - 16, this.drawPos.y);
-        ctx.arc(this.drawPos.x + this.size.x - 16, this.drawPos.y + 16, 16, Math.PI * 3 / 2, 0);
-        ctx.lineTo(this.drawPos.x + this.size.x, this.drawPos.y + this.size.y - 16);
-        ctx.arc(this.drawPos.x + this.size.x - 16, this.drawPos.y + this.size.y - 16, 16, 0, Math.PI / 2);
-        ctx.lineTo(this.drawPos.x + 16, this.drawPos.y + this.size.y);
-        ctx.arc(this.drawPos.x + 16, this.drawPos.y + this.size.y - 16, 16, Math.PI / 2, Math.PI);
-        ctx.lineTo(this.drawPos.x, this.drawPos.y + 16);
-        ctx.arc(this.drawPos.x + 16, this.drawPos.y + + 16, 16, Math.PI, Math.PI * 3 / 2);
+        DrawRoundedRectangle(this.drawPos.x, this.drawPos.y, this.size.x, this.size.y, 16);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();

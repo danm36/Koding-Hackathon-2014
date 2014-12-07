@@ -44,6 +44,13 @@ function onLoad()
 			var rect = canvas.getBoundingClientRect();
 			var newMousePosition = new Vector(e.clientX - rect.left, e.clientY - rect.top);
 			
+            if(draggingEl === undefined && actualMousePosition.x > canvas.width - sidebar.width)
+            {
+                sidebar.mouseMove(e, newMousePosition);
+                actualMousePosition = newMousePosition;
+                return;
+            }
+            
             if(mouseDown)
             {
                 if(selectedEl !== undefined && mouseDownPosition.Subtract(newMousePosition).LengthSquared() > 64)
@@ -67,12 +74,19 @@ function onLoad()
         {
             lastMouseDownElement = e.target;
         });
+        lastMouseDownElement = canvas;
         
 		canvas.addEventListener('mousedown', function(e)
 		{
             var rect = canvas.getBoundingClientRect();
 			mouseDownPosition = new Vector(e.clientX - rect.left, e.clientY - rect.top);       
 			mouseDown = true;
+            
+            if(draggingEl === undefined && actualMousePosition.x > canvas.width - sidebar.width)
+            {
+                sidebar.mouseDown(e);
+                return;
+            }
                       
             selectedEl = undefined;
             if(hoveringEl !== undefined)
@@ -93,6 +107,13 @@ function onLoad()
 		canvas.addEventListener('mouseup', function(e)
 		{				
 			mouseDown = false;
+            ctrlDownOnDrag = false;
+            
+            if(draggingEl === undefined && actualMousePosition.x > canvas.width - sidebar.width)
+            {
+                sidebar.mouseUp(e);
+                return;
+            }
             
             if(selectedEl instanceof NodePin)
                 selectedEl = selectedEl.parent;
@@ -111,6 +132,12 @@ function onLoad()
 			var delta = e.wheelDelta || -e.detail;
 			delta /= 1200; //In testing, wheelDelta has always been a factor of 120 for me, so this value works nicely
 			
+            if(draggingEl === undefined && actualMousePosition.x > canvas.width - sidebar.width)
+            {
+                sidebar.scrollTop -= delta * 256;
+                return;
+            }
+            
 			var oldZoom = targetZoomLevel;
 			
 			targetZoomLevel += delta;
@@ -134,10 +161,10 @@ function onLoad()
                         ctrlDownOnDrag = true;
                     break;
                 case 46: //[del] - Delete selected node
-                    var index = _workspace.indexOf(selectedEl);
-                    if(index >= 0)
-                        _workspace.splice(index, 1);
-                    selectedEl = undefined;
+                    if(selectedEl instanceof MainFunctionNode)
+                        break;
+                    
+                    DeleteNode(selectedEl);
                     break;
                 case 70: //[f] - Reset camera
                     ResetCamera();
@@ -227,16 +254,6 @@ function onLoad()
 	Draw();
     
     _workspace.push(new MainFunctionNode());
-    _workspace.push(new BasicNode(new Vector(256, 0)));
-    _workspace.push(new BasicNode(new Vector(512, 0)));     
-    _workspace.push(new PromptNode(new Vector(256, 128)));  
-    _workspace.push(new ConsoleLogNode(new Vector(512, 128)));
-    _workspace.push(new VarNode(new Vector(256, 256)));
-    _workspace.push(new BoolVarNode(new Vector(352, 256)));
-    _workspace.push(new StringVarNode(new Vector(448, 256)));
-    _workspace.push(new NumberVarNode(new Vector(544, 256)));
-    _workspace.push(new ObjectVarNode(new Vector(640, 256)));
-    _workspace.push(new ArrayVarNode(new Vector(736, 256)));
 }
 
 function Draw()
@@ -280,7 +297,6 @@ function Draw()
 	ctx.translate(actualPanPosition.x, actualPanPosition.y);
 	ctx.scale(actualZoomLevel, actualZoomLevel);
 	
-    
     for(var i = 0; i < _workspace.length; i++) //Initial draw
     {
         if(_workspace[i] === undefined)
@@ -300,11 +316,12 @@ function Draw()
     
     document.getElementById("canvas").className = "";
     if(mouseDown && !(draggingEl instanceof NodePin))
-		document.getElementById("canvas").className += " cursorDrag";
+		$("#canvas").addClass("cursorDrag");
     if(hoveringEl !== undefined || draggingEl instanceof NodePin)
-        document.getElementById("canvas").className += " cursorHover";	
+        $("#canvas").addClass("cursorHover");
 
-
+    sidebar.UpdateSidebar();
+    sidebar.DrawSidebar();
 							
 	window.requestAnimationFrame(Draw);
 }

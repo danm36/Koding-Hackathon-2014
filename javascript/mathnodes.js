@@ -9,6 +9,7 @@
 var AddNode = (function(_super)
 {
     __extends(AddNode, _super);
+    sidebar.AddToSidebar("AddNode", "Add (+)", "Math");
     function AddNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -16,7 +17,7 @@ var AddNode = (function(_super)
     
     AddNode.prototype.onCreate = function()
     {
-        this.displayName = "Add";
+        this.displayName = "Add (A + B = Result)";
         this.inputs.push(new NodePin(this, "A", "number"));
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
@@ -41,6 +42,7 @@ var AddNode = (function(_super)
 var SubtractNode = (function(_super)
 {
     __extends(SubtractNode, _super);
+    sidebar.AddToSidebar("SubtractNode", "Subtract (-)", "Math");
     function SubtractNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -48,7 +50,7 @@ var SubtractNode = (function(_super)
     
     SubtractNode.prototype.onCreate = function()
     {
-        this.displayName = "Subtract";
+        this.displayName = "Subtract (A - B = Result)";
         this.inputs.push(new NodePin(this, "A", "number"));
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
@@ -73,6 +75,7 @@ var SubtractNode = (function(_super)
 var MultiplyNode = (function(_super)
 {
     __extends(MultiplyNode, _super);
+    sidebar.AddToSidebar("MultiplyNode", "Multiply (*)", "Math");
     function MultiplyNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -80,7 +83,7 @@ var MultiplyNode = (function(_super)
     
     MultiplyNode.prototype.onCreate = function()
     {
-        this.displayName = "Multiply";
+        this.displayName = "Multiply (A * B = Result)";
         this.inputs.push(new NodePin(this, "A", "number"));
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
@@ -105,6 +108,7 @@ var MultiplyNode = (function(_super)
 var DivideNode = (function(_super)
 {
     __extends(DivideNode, _super);
+    sidebar.AddToSidebar("DivideNode", "Divide (/)", "Math");
     function DivideNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -112,7 +116,7 @@ var DivideNode = (function(_super)
     
     DivideNode.prototype.onCreate = function()
     {
-        this.displayName = "Multiply";
+        this.displayName = "Divide (A / B = Result)";
         this.inputs.push(new NodePin(this, "A", "number"));
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
@@ -134,23 +138,24 @@ var DivideNode = (function(_super)
     return DivideNode;
 })(BasicNode);
 
-var ModulusNode = (function(_super)
+var ModuloNode = (function(_super)
 {
-    __extends(ModulusNode, _super);
-    function ModulusNode(spawnPos)
+    __extends(ModuloNode, _super);
+    sidebar.AddToSidebar("ModuloNode", "Modulo (%)", "Math");
+    function ModuloNode(spawnPos)
 	{
         _super.call(this, spawnPos);
     }
     
-    ModulusNode.prototype.onCreate = function()
+    ModuloNode.prototype.onCreate = function()
     {
-        this.displayName = "Modulus";
+        this.displayName = "Modulo (A % B = Result)";
         this.inputs.push(new NodePin(this, "A", "number"));
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
     	 
-    ModulusNode.prototype.getValue = function(pin)
+    ModuloNode.prototype.getValue = function(pin)
     {
         try
         {
@@ -163,5 +168,5 @@ var ModulusNode = (function(_super)
         }
     }
     
-    return ModulusNode;
+    return ModuloNode;
 })(BasicNode);

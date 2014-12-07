@@ -9,6 +9,7 @@
 var PromptNode = (function(_super)
 {
     __extends(PromptNode, _super);
+    sidebar.AddToSidebar("PromptNode", "Prompt", "Input");
     function PromptNode(spawnPos)
 	{
         _super.call(this, spawnPos);

@@ -81,6 +81,40 @@ function UpdateNodeProp(el, prop, type)
     selectedEl.reset();
 }
 
+function DeleteNode(el)
+{
+    if(el === undefined)
+        return;
+    
+    var index = _workspace.indexOf(selectedEl);
+    if(index >= 0)
+    {
+        _workspace.splice(index, 1);  
+    }
+    if(el == selectedEl)
+        selectedEl = undefined;
+    if(el == draggingEl)
+        draggingEl = undefined;
+    if(el == hoveringEl)
+        hoveringEl = undefined;
+    
+    if(el instanceof BasicNode)
+    {
+        SelectNode(undefined);
+        
+        for(var i = 0; i < el.inputs.length; i++)
+        {
+            if(el.inputs[i].connectee !== undefined)
+                el.inputs[i].connectee = el.inputs[i].connectee.connectee = undefined;
+        }
+        for(var i = 0; i < el.outputs.length; i++)
+        {
+            if(el.outputs[i].connectee !== undefined)
+                el.outputs[i].connectee = el.outputs[i].connectee.connectee = undefined;
+        }
+    }
+}
+
 //Draw a polygon of 'N' sides with a center of x and y and a radius of r
 function DrawNPoly(x, y, r, N, rot)
 {
@@ -98,6 +132,19 @@ function DrawNPoly(x, y, r, N, rot)
 				   y + r * Math.sin(2 * Math.PI * (n / N) - Math.PI / 2 + rot));
 	}
 	ctx.closePath();
+}
+
+function DrawRoundedRectangle(x, y, w, h, r)
+{
+    ctx.moveTo  (x + r,     y);
+    ctx.lineTo  (x + w - r, y);
+    ctx.arc     (x + w - r, y + r,      r, Math.PI * 3 / 2, 0);
+    ctx.lineTo  (x + w,     y + h - r);
+    ctx.arc     (x + w - r, y + h - r,  r, 0,               Math.PI / 2);
+    ctx.lineTo  (x + r,     y + h);
+    ctx.arc     (x + r,     y + h - r,  r, Math.PI / 2,     Math.PI);
+    ctx.lineTo  (x,         y + r);
+    ctx.arc     (x + r,     y + r,      r, Math.PI,         Math.PI * 3 / 2);
 }
 
 //Linearly interpolates between 'a' and 'b' via alpha
@@ -195,9 +242,9 @@ function ColorDarken(a, alpha)
 		return a; //Can't parse color
 	}
 	
-	aR = Math.max(Math.min(aR * alpha, 255), 0);
-	aG = Math.max(Math.min(aG * alpha, 255), 0);
-	aB = Math.max(Math.min(aB * alpha, 255), 0);
+	aR = parseInt(Math.max(Math.min(aR * alpha, 255), 0));
+	aG = parseInt(Math.max(Math.min(aG * alpha, 255), 0));
+	aB = parseInt(Math.max(Math.min(aB * alpha, 255), 0));
 	
 	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
 }
@@ -233,9 +280,9 @@ function ColorLighten(a, alpha)
 		return a; //Can't parse color
 	}
 	
-	aR = Math.max(Math.min(aR + (255 * alpha), 255), 0);
-	aG = Math.max(Math.min(aG + (255 * alpha), 255), 0);
-	aB = Math.max(Math.min(aB + (255 * alpha), 255), 0);
+	aR = parseInt(Math.max(Math.min(aR + (255 * alpha), 255), 0));
+	aG = parseInt(Math.max(Math.min(aG + (255 * alpha), 255), 0));
+	aB = parseInt(Math.max(Math.min(aB + (255 * alpha), 255), 0));
 	
 	return "rgba(" + aR + "," + aG + "," + aB + "," + aA + ")";
 }

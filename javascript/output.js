@@ -9,6 +9,7 @@
 var ConsoleLogNode = (function(_super)
 {
     __extends(ConsoleLogNode, _super);
+    sidebar.AddToSidebar("ConsoleLogNode", "console.log()", "Output");
     function ConsoleLogNode(spawnPos)
 	{
         _super.call(this, spawnPos);
