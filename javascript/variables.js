@@ -182,6 +182,7 @@ var BoolVarNode = (function(_super)
 var StringVarNode = (function(_super)
 {
     __extends(StringVarNode, _super);
+    sidebar.AddToSidebar("StringVarNode", "String", "Variables");
     function StringVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
