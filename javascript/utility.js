@@ -27,59 +27,94 @@ function OnResize()
     canvas.style.height = canvas.height + "px";
 }
 
-function SelectNode(node)
+function RunSimulation()
 {
-    $("#propArea").empty();
-    if(!(node instanceof BasicNode))
-        return;
-    
-    var toAppend = "<h2>" + node.displayName + "</h2>";
-    toAppend += "<table class='propertyGrid'><tbody>";
-    
-    var bHasProperty = false;
-    for(var prop in node.properties)
+    if(lastErrors.length > 0)
     {
-        bHasProperty = true;
-        switch(node.properties[prop].type.toLowerCase())
-        {
-            default:
-            case "string":
-                toAppend += "<tr><td>" + prop + "</td><td><input type=\"text\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'string');\" value=\"" + node.properties[prop].value + "\" /></td></tr>";
-                break;
-            case "bool":
-                toAppend += "<tr><td>" + prop + "</td><td><input type=\"checkbox\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'bool');\" value=\"true\" " + (node.properties[prop].value == true ? "checked" : "") + "/></td></tr>";
-                break;
-            case "number":
-                toAppend += "<tr><td>" + prop + "</td><td><input type=\"number\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'number');\" value=\"" + node.properties[prop].value + "\" step=\"any\" /></td></tr>";
-                break;
-            case "object":
-                toAppend += "<tr><td>" + prop + "</td><td>Objects not currently handled</td></tr>";
-                break; 
-            case "array":
-                toAppend += "<tr><td>" + prop + "</td><td>Arrays not currently handled</td></tr>";
-                break; 
-        }
+        $("#errorListTabBtn").click();
+        alert("Cannot run simulation - There are errors!\n\nFix any errors then try running again");
+        return;
     }
     
-    if(!bHasProperty)
-        toAppend += "<tr><td colspan=\"2\" style=\"text-align: center; padding: 10px 0px;\">This node has no configurable properties</td></tr>";
-    
-    toAppend += "</tbody></table>";
-    $("#propArea").append(toAppend);
-    
-    selectedEl = node;
+    var playFromNode = _breakpointNode;
+    for(var i = 0; i < _workspace.length; i++)
+    {
+        _workspace[i].reset();
+        _workspace[i].bIsActive = false;
+        if(_breakpointNode === undefined && _workspace[i] instanceof MainFunctionNode)
+            playFromNode = _workspace[i];
+    }
+        
+    if(playFromNode !== undefined)
+    {
+        _WCState = 1;
+        
+        playFromNode.bIsActive = true;
+        playFromNode.bIsBreakpoint = false;
+        playFromNode.fire();
+        if(playFromNode === _breakpointNode)
+        {
+            playFromNode.bIsBreakpoint = true;
+            console.info("[" + playFromNode.constructor.name + "@" + playFromNode.getId() + "] Breakpoint resumed");
+        }
+        else
+        {
+            console.info("Program simulation begin");   
+        }
+        
+        _breakpointNode = undefined;
+    }
 }
 
-function UpdateNodeProp(el, prop, type)
+function StopSimulation()
 {
-    if(type == "bool")
-        selectedEl.properties[prop].value = el.checked;
-    else if(type == "number")
-        selectedEl.properties[prop].value = parseFloat(el.value);
-    else
-        selectedEl.properties[prop].value = el.value;
-    selectedEl.reset();
+    _WCState = 0;
+    for(var i = 0; i < _workspace.length; i++)
+    {
+        _workspace[i].reset();
+        _workspace[i].bIsActive = false;
+    }
+    console.info("Program simulation stopped");
 }
+
+function PauseSimulation(bFocusOnNode)
+{
+    _WCState = 2;
+    _breakpointNode = _currentNode;
+    SelectNode(_breakpointNode, true);
+    console.info("[" + _breakpointNode.constructor.name + "@" + this.getId() + "] Paused by user");
+}
+
+function SelectNode(node, bFocus)
+{
+    $("#propArea").empty();
+    selectedEl = undefined;
+
+    
+    if(!(node instanceof BasicNode))
+    {
+        if(!(!isNaN(parseInt(node)) && isFinite(node)))
+            return;
+        
+        var nodeID = parseInt(node);
+        
+        for(var i = 0; i < _workspace.length; i++)
+        {
+            if(_workspace[i].getId() == nodeID)
+            {
+                node = _workspace[i];
+                break;
+            }
+        }
+    }
+        
+    selectedEl = node;
+    SelectNodeProperties(node);
+    
+    if(bFocus)
+        targetPanPosition = node.drawPos.Add(node.size.Divide(2)).Multiply(-1).Add(new Vector(canvas.width / 2 - sidebar.width / 2, canvas.height / 2));
+}
+
 
 function DeleteNode(el)
 {
@@ -112,6 +147,8 @@ function DeleteNode(el)
             if(el.outputs[i].connectee !== undefined)
                 el.outputs[i].connectee = el.outputs[i].connectee.connectee = undefined;
         }
+        
+        el.onDelete();
     }
 }
 

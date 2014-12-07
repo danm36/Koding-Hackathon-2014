@@ -8,6 +8,8 @@
  
 var BasicNode = (function()
 {
+    BasicNode.sTotalNodes = 0;
+    
     sidebar.AddToSidebar("BasicNode", "Relay", "Basic");
     function BasicNode(spawnPos)
 	{
@@ -20,9 +22,12 @@ var BasicNode = (function()
         this.outputs = new Array();
         this.bIsActive = false;
         this.properties = { };
+        this.bIsBreakpoint = false;
+        
+        this.curError = undefined;
         
         this.onCreate();
-        this.reset(); 
+        this.reset();
     }
     
     BasicNode.prototype.onCreate = function()
@@ -31,8 +36,9 @@ var BasicNode = (function()
         this.inputs.push(new NodePin(this, "In", "flow"));
         this.outputs.push(new NodePin(this, "Out", "flow"));
     }
-	
-	BasicNode.sTotalNodes = 0;
+    
+    BasicNode.prototype.onDelete = function() { }
+		
     BasicNode.prototype.getId = function()
 	{
         return this.mId;
@@ -43,13 +49,56 @@ var BasicNode = (function()
         this.mId = pId;
     };
     
-    BasicNode.prototype.fire = function()
+    BasicNode.prototype.fire = function(params)
     {
+        if(_WCState !== 1)
+        {
+            this.bIsActive = false;
+            return;
+        }
+        
+        _currentNode = this;
+        this.bIsActive = true;
+        
+        if(_jumpingbackto !== undefined)
+        {
+            if(_jumpingbackto !== this.constructor.name)
+            {
+                this.inputs[0].fire();
+                this.bIsActive = false;
+                return;
+            }
+             _jumpingbackto = undefined;
+            this.justJumpedTo = true;
+        }
+        
+        if(_jumpingto !== undefined)
+        {
+            if(_jumpingto !== this.constructor.name)
+            {
+                this.outputs[0].fire(true);
+                this.bIsActive = false;
+                return;
+            }
+             _jumpingto = undefined; 
+            this.justJumpedTo = true;
+        } 
+        
+        if(this.bIsBreakpoint && _breakpointNode === undefined)
+        {
+            _WCState = 2;
+            SelectNode(this, true);
+            _breakpointNode = this;
+            console.info("[" + this.constructor.name + "@" + this.getId() + "] Breakpoint triggered");
+            return;
+        }
+        
         var self = this;
         setTimeout(function()
         {
-            self.execute();
-        }, 100);
+            self.execute(params);
+            self.justJumpedTo = false;
+        }, _playbackSpeed);
     }
     
     BasicNode.prototype.execute = function()
@@ -75,8 +124,23 @@ var BasicNode = (function()
 		
     BasicNode.prototype.reset = function() { }
     
+    BasicNode.prototype.onMouseUp = function()
+    {
+        if(mousePosition.x > this.drawPos.x + 2 && mousePosition.y > this.drawPos.y + 2 &&
+           mousePosition.x < this.drawPos.x + 18 && mousePosition.y < this.drawPos.y + 20)
+        {
+            this.bIsBreakpoint = !this.bIsBreakpoint;
+            return true;
+        }
+        
+        return false;
+    }
+    
 	BasicNode.prototype.update = function()
     {	
+        if(!(this instanceof VarNode))
+            this.reset();
+        
         if(draggingEl === this && ctrlDownOnDrag)
         {
             this.drawPos = mousePosition.Copy().Subtract(this.size.Divide(2));
@@ -114,8 +178,7 @@ var BasicNode = (function()
 					hoveringEl = undefined;
 			}
 		}
-        
-        
+          
         if(hoveringEl == this)
         {
             this.hoverTimer += 0.05; //Because I can't be bothered to work out a delta time - Not critical for what this is being used for
@@ -135,7 +198,7 @@ var BasicNode = (function()
         ctx.font = "10pt Trebuchet MS";
         ctx.fillStyle = "#000000";
         var stringSize = ctx.measureText(this.displayName);
-        this.size.x = Math.max(stringSize.width + 16, 128);
+        this.size.x = Math.max(stringSize.width + 32, 128);
         
         var largerIO = Math.max(this.inputs.length, this.outputs.length) - 1;
         this.size.y = 64 + 24 * largerIO;
@@ -157,7 +220,12 @@ var BasicNode = (function()
         
         if(selectedEl == this && !mouseDown)
         {
-            ctx.shadowColor = styleData.nodeSelectionGlow;
+            ctx.shadowColor = this.curError !== undefined ? styleData.nodeSelectionErrorGlow : styleData.nodeSelectionGlow;
+            ctx.shadowBlur = 20;
+        }
+        else if(this.curError !== undefined)
+        {
+            ctx.shadowColor = styleData.nodeErrorGlow;
             ctx.shadowBlur = 20;
         }
         
@@ -168,6 +236,17 @@ var BasicNode = (function()
         ctx.stroke();
         
         ctx.shadowBlur = 0;
+        
+        //Breakpoint indicator
+        if(!(this instanceof MainFunctionNode))
+        {
+            ctx.beginPath();
+            ctx.fillStyle = this.bIsBreakpoint ? styleData.nodeBreakpointActive : styleData.nodeBreakpointInactive;
+            ctx.strokeStyle = "#000000";
+            ctx.arc(this.drawPos.x + 10, this.drawPos.y + 12, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        }
         
         ctx.font = "10pt Trebuchet MS";
         ctx.fillStyle = "#000000";
@@ -195,7 +274,7 @@ var BasicNode = (function()
 
 var NodePin = (function()
 {
-    function NodePin(parent, label, type)
+    function NodePin(parent, label, type, bIsVarNode)
 	{
         this.setId(NodePin.sTotalNodes++);
         this.myFillColor = "#000000";
@@ -203,6 +282,7 @@ var NodePin = (function()
         this.label = label || "";
         this.type = type.toLowerCase();
         this.radius = 16;
+        this.bIsVarNode = bIsVarNode;
         
         var otherTypes = nodePinTypeSupports[this.type] || new Array();
         otherTypes.push(type);
@@ -237,6 +317,37 @@ var NodePin = (function()
         {
             if(_workspace[i] instanceof BasicNode && _workspace[i] !== this.parent)
             {
+                if(this.bIsVarNode)
+                {
+                    for(var j = 0; j < _workspace[i].inputs.length; j++)
+                    {
+                        if( _workspace[i].inputs[j].supportedTypes.indexOf(this.type) >= 0 &&
+                            mousePosition.x > _workspace[i].inputs[j].drawPos.x &&
+                            mousePosition.y > _workspace[i].inputs[j].drawPos.y &&
+                            mousePosition.x < _workspace[i].inputs[j].drawPos.x + _workspace[i].inputs[j].radius &&
+                            mousePosition.y < _workspace[i].inputs[j].drawPos.y + _workspace[i].inputs[j].radius)
+                        {
+                            if(_workspace[i].inputs[j].connectee !== undefined)
+                                _workspace[i].inputs[j].connectee.connectee = undefined;
+                            _workspace[i].inputs[j].connectee = this;
+                            return;
+                        }
+                    }
+                    for(var j = 0; j < _workspace[i].outputs.length; j++)
+                    {                        
+                        if( this.supportedTypes.indexOf(_workspace[i].outputs[j].type) >= 0 &&
+                            mousePosition.x > _workspace[i].outputs[j].drawPos.x &&
+                            mousePosition.y > _workspace[i].outputs[j].drawPos.y &&
+                            mousePosition.x < _workspace[i].outputs[j].drawPos.x + _workspace[i].outputs[j].radius &&
+                            mousePosition.y < _workspace[i].outputs[j].drawPos.y + _workspace[i].outputs[j].radius)
+                        {
+                            if(_workspace[i].outputs[j].connectee !== undefined)
+                                _workspace[i].outputs[j].connectee.connectee = undefined;
+                            _workspace[i].outputs[j].connectee = this;
+                            return;
+                        }
+                    }
+                }
                 if(this.isOutput)
                 {
                     for(var j = 0; j < _workspace[i].inputs.length; j++)
@@ -247,10 +358,14 @@ var NodePin = (function()
                             mousePosition.x < _workspace[i].inputs[j].drawPos.x + _workspace[i].inputs[j].radius &&
                             mousePosition.y < _workspace[i].inputs[j].drawPos.y + _workspace[i].inputs[j].radius)
                         {
+                            
                             this.connectee = _workspace[i].inputs[j];
-                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this.connectee)
-                                this.connectee.connectee.connectee = undefined;
-                            this.connectee.connectee = this;
+                            if(!this.connectee.bIsVarNode)
+                            {
+                                if(this.connectee.connectee !== undefined)
+                                    this.connectee.connectee.connectee = undefined;
+                                this.connectee.connectee = this;
+                            }
                             return;
                         }
                     }
@@ -266,9 +381,12 @@ var NodePin = (function()
                             mousePosition.y < _workspace[i].outputs[j].drawPos.y + _workspace[i].outputs[j].radius)
                         {
                             this.connectee = _workspace[i].outputs[j];
-                            if(this.connectee.connectee !== undefined && this.connectee.connectee.connectee !== this.connectee)
-                                this.connectee.connectee.connectee = undefined;
-                            this.connectee.connectee = this;
+                            if(!this.connectee.bIsVarNode)
+                            {
+                                if(this.connectee.connectee !== undefined)
+                                    this.connectee.connectee.connectee = undefined;
+                                this.connectee.connectee = this;
+                            }
                             return;
                         }
                     }
@@ -282,15 +400,30 @@ var NodePin = (function()
         if(this.isOutput)
         {
             if(this.connectee !== undefined)
+            {
                 this.connectee.fire(); 
+            }
             else
-                _WCState = 0;   
+            {
+                if(CallFunctionNode.waitStack.length > 0)
+                    CallFunctionNode.waitStack.pop().execute(true);
+                else
+                    _WCState = 0;   
+                
+            }
             this.parent.bIsActive = false;
         }
         else
         {
-            this.parent.fire();
-            this.parent.bIsActive = true;
+            if(_jumpingbackto !== undefined)
+            {
+                this.connectee.parent.fire();
+            }
+            else
+            {
+                this.parent.bIsActive = true;
+                this.parent.fire();         
+            }
         }
     }
 
@@ -370,7 +503,7 @@ var NodePin = (function()
         {
             lineEndPoint = mousePosition.Copy();            
         }
-        else if(this.connectee !== undefined && this.isOutput)
+        else if(this.connectee !== undefined && ((!this.bIsVarNode && this.isOutput) || this.connectee.bIsVarNode))
         {
             lineEndPoint = this.connectee.drawPos.Copy().Add(new Vector(this.connectee.radius / 2, this.connectee.radius / 2));
         }

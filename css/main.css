@@ -115,6 +115,13 @@ canvas.cursorDrag
     background: #ECECEC;
 }
 
+#drawerContent .logLink
+{
+    cursor: pointer;
+    text-decoration: underline;
+    float: right;
+}
+
 #drawerContent #console
 {
     overflow-y: auto;
@@ -139,6 +146,17 @@ canvas.cursorDrag
     width: 100%;
     font-family: monospace;
     padding: 2px;
+}
+
+#drawer #tabs #errorListTabBtn.errored
+{
+    font-weight:  bold;
+    color: #AA0000;
+}
+
+#drawer #tabs #errorListTabBtn.errored:before, #drawer #tabs #errorListTabBtn.errored:after
+{
+    content: " (!) ";   
 }
 
 #properties

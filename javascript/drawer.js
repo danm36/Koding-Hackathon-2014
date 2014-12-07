@@ -71,3 +71,136 @@ function drawerConsoleKeyDown(e)
         $("#consoleInput").val("");
     }        
 }
+
+
+function SelectNodeProperties(node)
+{
+    if(!(node instanceof BasicNode))
+        return;
+    
+    var toAppend = "<h2>" + node.displayName + "</h2>";
+    toAppend += "<table class='propertyGrid'><tbody>";
+    
+    var bHasProperty = false;
+    for(var prop in node.properties)
+    {
+        bHasProperty = true;
+        switch(node.properties[prop].type.toLowerCase())
+        {
+            default:
+            case "string":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"text\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'string');\" value=\"" + node.properties[prop].value + "\" /></td></tr>";
+                break;
+            case "bool":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"checkbox\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'bool');\" value=\"true\" " + (node.properties[prop].value == true ? "checked" : "") + "/></td></tr>";
+                break;
+            case "number":
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"number\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'number');\" value=\"" + node.properties[prop].value + "\" step=\"" + (node.properties[prop].step || "any") + "\" " + (node.properties[prop].min !== undefined ? "min=\"" + node.properties[prop].min + "\"" : "") + "  " + (node.properties[prop].max !== undefined ? "max=\"" + node.properties[prop].max + "\"" : "") + " /></td></tr>";
+                break;
+            case "object":
+                toAppend += "<tr><td>" + prop + "</td><td>Objects not currently handled</td></tr>";
+                break; 
+            case "array":
+                toAppend += "<tr><td>" + prop + "</td><td>Arrays not currently handled</td></tr>";
+                break; 
+        }
+    }
+    
+    if(!bHasProperty)
+        toAppend += "<tr><td colspan=\"2\" style=\"text-align: center; padding: 10px 0px;\">This node has no configurable properties</td></tr>";
+    
+    toAppend += "</tbody></table>";
+    $("#propArea").append(toAppend);
+}
+
+function UpdateNodeProp(el, prop, type)
+{
+    if(selectedEl == undefined)
+        return;
+    
+    if(type == "bool")
+    {
+        selectedEl.properties[prop].value = el.checked;
+    }
+    else if(type == "number")
+    {
+        val = parseFloat(el.value);
+        
+        if(selectedEl.properties[prop].max !== undefined)
+            val = Math.min(val, selectedEl.properties[prop].max);
+        if(selectedEl.properties[prop].min !== undefined)
+            val = Math.max(val, selectedEl.properties[prop].min);
+        if(selectedEl.properties[prop].step !== undefined)
+            val = Math.round(val / selectedEl.properties[prop].step) * selectedEl.properties[prop].step;
+        
+        el.value = val;
+        selectedEl.properties[prop].value = parseFloat(val);
+    }
+    else
+    {
+        selectedEl.properties[prop].value = el.value;
+    }
+    selectedEl.reset();
+}
+
+
+var lastErrors = [];
+var curErrors = [];
+function AddError(node, message)
+{
+    curErrors.push({node: node, message: message});
+}
+
+function CheckForNewErrors()
+{
+    var changeHappened = false;
+    var addedErrors = curErrors.filter(function(el)
+    {
+        for(var i = 0; i < lastErrors.length; i++)
+        {
+            if(curErrors[i].node == el.node && curErrors[i].message == el.message)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    });
+    
+    var removedErrors = lastErrors.filter(function(el)
+    {
+        for(var i = 0; i < curErrors.length; i++)
+        {
+            if(curErrors[i].node == el.node && curErrors[i].message == el.message)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    });
+            
+    //console.log(diffErrors);
+    if(addedErrors.length > 0 || removedErrors.length > 0) //Change has happened
+    {
+        $("#errorOutput").empty();
+        
+        
+        if(curErrors.length > 0)
+        {
+            $("#errorListTabBtn").addClass("errored");
+            
+            var toAppend = "";
+            for(var i = 0; i < curErrors.length; i++)
+                toAppend += "<div class=\"logRow\" style=\"color: #FF0000;\">[" + curErrors[i].node.constructor.name + "@" + curErrors[i].node.getId() + "] " + curErrors[i].message  + "<span class=\"logLink\" onclick=\"SelectNode(" + curErrors[i].node.getId() + ", true);\">Highlight Node</span></div>";           
+            $("#errorOutput").append(toAppend);
+        }
+        else
+        {
+            $("#errorListTabBtn").removeClass("errored");
+        }
+    }
+        
+    lastErrors = curErrors;
+    curErrors = [];
+}

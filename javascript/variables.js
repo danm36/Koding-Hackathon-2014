@@ -9,7 +9,7 @@
 var VarNode = (function(_super)
 {
     __extends(VarNode, _super);
-    sidebar.AddToSidebar("VarNode", "var", "Variables");
+    sidebar.AddToSidebar("VarNode", "Var (Any type)", "Variables");
     function VarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -18,8 +18,9 @@ var VarNode = (function(_super)
     VarNode.prototype.onCreate = function()
     {
         this.value = "";
-        this.inputs.push(new NodePin(this, "In", "var"));
-        this.outputs.push(new NodePin(this, "Out", "var"));
+        var IOPin = new NodePin(this, "IO", "var", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
@@ -92,22 +93,14 @@ var VarNode = (function(_super)
 	
     VarNode.prototype.draw = function(bDontClip)
     {
-        this.bDontDraw = bDontClip;
-    }
-    
-	VarNode.prototype.drawConnectingLines = function()
-	{        
-		//Bounds checking so we can avoid expensive bezier or circle drawing
+        //Bounds checking so we can avoid expensive bezier or circle drawing
 		//bDontClip stops minimap clipping
-        if( this.bDontDraw !== true && (
+        if( bDontClip !== true && (
 			(this.drawPos.x + this.size.x) * actualZoomLevel 	< -actualPanPosition.x ||
 			(this.drawPos.x * actualZoomLevel) - canvas.width 	> -actualPanPosition.x ||
 			(this.drawPos.y + this.size.y) * actualZoomLevel 	< -actualPanPosition.y ||
 			(this.drawPos.y * actualZoomLevel) - canvas.height 	> -actualPanPosition.y))
 		  return;
-        
-        this.inputs[0].drawConnectingLines();
-        this.outputs[0].drawConnectingLines();
         
         ctx.fillStyle = this.myFillColor;
         ctx.strokeStyle = styleData.pinFillColor[this.outputs[0].type] || "#000000";
@@ -118,7 +111,6 @@ var VarNode = (function(_super)
             ctx.shadowBlur = 20;
         }
         ctx.beginPath();
-        ctx.moveTo(this.drawPos.x + this.size.x, this.drawPos.y + this.size.y / 2);
         ctx.arc(this.drawPos.x + this.size.x / 2, this.drawPos.y + this.size.y / 2, this.size.x / 2, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
@@ -145,7 +137,9 @@ var VarNode = (function(_super)
         ctx.fillText(dispValue, this.drawPos.x + this.size.x / 2 - ctx.measureText(dispValue).width / 2, this.drawPos.y + this.size.y / 2 + 4);    
         ctx.font = "10pt Trebuchet MS";
         ctx.fillText(this.displayName, this.drawPos.x + this.size.x / 2 - ctx.measureText(this.displayName).width / 2, this.drawPos.y + this.size.y + 12); 
-    };
+    }
+    
+	VarNode.prototype.drawConnectingLines = function() { };
     
     return VarNode;
 })(BasicNode);
@@ -162,8 +156,9 @@ var BoolVarNode = (function(_super)
     BoolVarNode.prototype.onCreate = function()
     {
         this.value = false;
-        this.inputs.push(new NodePin(this, "In", "bool"));
-        this.outputs.push(new NodePin(this, "Out", "bool"));
+        var IOPin = new NodePin(this, "IO", "bool", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
@@ -197,8 +192,9 @@ var StringVarNode = (function(_super)
     StringVarNode.prototype.onCreate = function()
     {
         this.value = false;
-        this.inputs.push(new NodePin(this, "In", "string"));
-        this.outputs.push(new NodePin(this, "Out", "string"));
+        var IOPin = new NodePin(this, "IO", "string", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
@@ -232,8 +228,9 @@ var NumberVarNode = (function(_super)
     NumberVarNode.prototype.onCreate = function()
     {
         this.value = false;
-        this.inputs.push(new NodePin(this, "In", "number"));
-        this.outputs.push(new NodePin(this, "Out", "number"));
+        var IOPin = new NodePin(this, "IO", "number", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
@@ -267,8 +264,9 @@ var ObjectVarNode = (function(_super)
     ObjectVarNode.prototype.onCreate = function()
     {
         this.value = false;
-        this.inputs.push(new NodePin(this, "In", "object"));
-        this.outputs.push(new NodePin(this, "Out", "object"));
+        var IOPin = new NodePin(this, "IO", "object", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {
@@ -302,8 +300,9 @@ var ArrayVarNode = (function(_super)
     ArrayVarNode.prototype.onCreate = function()
     {
         this.value = false;
-        this.inputs.push(new NodePin(this, "In", "array"));
-        this.outputs.push(new NodePin(this, "Out", "array"));
+        var IOPin = new NodePin(this, "IO", "array", true);
+        this.inputs.push(IOPin);
+        this.outputs.push(IOPin);
         this.inputs[0].radius = this.outputs[0].radius = this.size.x = this.size.y = 64;
         this.outputs[0].isOutput = true;
         this.properties = {

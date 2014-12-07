@@ -6,6 +6,37 @@
  * Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk231b936d.danm36.koding.io/
  *****************************************************************************************************************************************/
  
+var ConfirmNode = (function(_super)
+{
+    __extends(ConfirmNode, _super);
+    sidebar.AddToSidebar("ConfirmNode", "Confirm", "Input");
+    function ConfirmNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    ConfirmNode.prototype.onCreate = function()
+    {
+        this.displayName = "confirm()";
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.inputs.push(new NodePin(this, "Message", "string"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+        this.outputs.push(new NodePin(this, "Result", "bool"));
+        
+        this.properties = {
+            message: { type: "string", value: "Are you sure?" },
+        };
+    }
+    
+    ConfirmNode.prototype.execute = function()
+    {
+        this.setValue(this.outputs[1], confirm(this.getValue(this.inputs[1]) || this.properties.message.value));
+        this.outputs[0].fire();   
+    }
+	    		
+    return ConfirmNode;
+})(BasicNode);
+
 var PromptNode = (function(_super)
 {
     __extends(PromptNode, _super);

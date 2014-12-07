@@ -6,6 +6,33 @@
  * Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk231b936d.danm36.koding.io/
  *****************************************************************************************************************************************/
 
+var SetVarNode = (function(_super)
+{
+    __extends(SetVarNode, _super);
+    sidebar.AddToSidebar("SetVarNode", "Set Var", "Basic");
+    function SetVarNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    SetVarNode.prototype.onCreate = function()
+    {
+        this.displayName = "Set Var (Result = Var)";
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.inputs.push(new NodePin(this, "Var", "var"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+        this.outputs.push(new NodePin(this, "Result", "var"));
+    }
+    
+    SetVarNode.prototype.execute = function()
+    {
+        this.setValue(this.outputs[1], this.getValue(this.inputs[1]));
+        this.outputs[0].fire();
+    }
+	    		
+    return SetVarNode;
+})(BasicNode);
+
 var AddNode = (function(_super)
 {
     __extends(AddNode, _super);
@@ -169,4 +196,106 @@ var ModuloNode = (function(_super)
     }
     
     return ModuloNode;
+})(BasicNode);
+
+var IncrementNode = (function(_super)
+{
+    __extends(IncrementNode, _super);
+    sidebar.AddToSidebar("IncrementNode", "Increment (++)", "Math");
+    function IncrementNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    IncrementNode.prototype.onCreate = function()
+    {
+        this.displayName = "Increment (Var++)";
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.inputs.push(new NodePin(this, "Var", "number"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+    }
+    
+    IncrementNode.prototype.execute = function()
+    {
+        this.setValue(this.inputs[1], this.getValue(this.inputs[1]) + 1);
+        this.outputs[0].fire();
+    }
+	    		
+    return IncrementNode;
+})(BasicNode);
+
+var DecrementNode = (function(_super)
+{
+    __extends(DecrementNode, _super);
+    sidebar.AddToSidebar("DecrementNode", "Decrement (--)", "Math");
+    function DecrementNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    DecrementNode.prototype.onCreate = function()
+    {
+        this.displayName = "Decrement (Var--)";
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.inputs.push(new NodePin(this, "Var", "number"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+    }
+    
+    DecrementNode.prototype.execute = function()
+    {
+        this.setValue(this.inputs[1], this.getValue(this.inputs[1]) - 1);
+        this.outputs[0].fire();
+    }
+	    		
+    return DecrementNode;
+})(BasicNode);
+
+var IncrementInlineNode = (function(_super)
+{
+    __extends(IncrementInlineNode, _super);
+    sidebar.AddToSidebar("IncrementInlineNode", "Increment Inline (++)", "Math");
+    function IncrementInlineNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    IncrementInlineNode.prototype.onCreate = function()
+    {
+        this.displayName = "Increment Inline (Var++)";
+        this.inputs.push(new NodePin(this, "Var", "number"));
+        this.outputs.push(new NodePin(this, "Result", "number"));
+    }
+    
+    IncrementInlineNode.prototype.getValue = function(pin)
+    {
+        this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() + 1);
+        return this.inputs[0].connectee.parent.getValue();
+    }
+	    		
+    return IncrementInlineNode;
+})(BasicNode);
+
+var DecrementInlineNode = (function(_super)
+{
+    __extends(DecrementInlineNode, _super);
+    sidebar.AddToSidebar("DecrementInlineNode", "Decrement Inline (--)", "Math");
+    function DecrementInlineNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    DecrementInlineNode.prototype.onCreate = function()
+    {
+        this.displayName = "Decrement Inline (Var++)";
+        this.inputs.push(new NodePin(this, "Var", "number"));
+        this.outputs.push(new NodePin(this, "Result", "number"));
+    }
+    
+    DecrementInlineNode.prototype.getValue = function(pin)
+    {
+        this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() - 1);
+        return this.inputs[0].connectee.parent.getValue();
+    }
+	    		
+    return DecrementInlineNode;
 })(BasicNode);

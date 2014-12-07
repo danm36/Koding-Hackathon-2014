@@ -115,9 +115,15 @@ function onLoad()
                 return;
             }
             
-            if(selectedEl instanceof NodePin)
-                selectedEl = selectedEl.parent;
-            SelectNode(selectedEl);
+            if(selectedEl !== undefined)
+            {
+                if(selectedEl instanceof NodePin)
+                    selectedEl = selectedEl.parent;
+                if(selectedEl.onMouseUp() !== true)
+                    SelectNode(selectedEl);
+                else
+                    selectedEl = undefined;
+            }
             
             if(draggingEl !== undefined)
             {
@@ -170,15 +176,10 @@ function onLoad()
                     ResetCamera();
                     break;
 				case 82: //[r] - Run simulation
-                    for(var i = 0; i < _workspace.length; i++)
-                    {
-                        _workspace[i].reset();
-                        if(_workspace[i] instanceof MainFunctionNode)
-                        {
-                            _workspace[i].bIsActive = true;
-                            _workspace[i].fire();
-                        }
-                    }
+                    if(_WCState !== 1)
+                        RunSimulation();
+                    else
+                        StopSimulation();
 					break;
                     
                 //Temp
@@ -305,14 +306,23 @@ function Draw()
             i--;
             continue;
         }
+        
         _workspace[i].update();
-        _workspace[i].draw();
-    }
-    
-    for(var i = 0; i < _workspace.length; i++) //Lines connecting pins
-    {
+        if(_workspace[i].curError !== undefined)
+            AddError(_workspace[i], _workspace[i].curError);
+        if(!(_workspace[i] instanceof VarNode))
+            _workspace[i].draw();
+        
         _workspace[i].drawConnectingLines();
     }
+      
+    for(var i = 0; i < _workspace.length; i++) //Draw var nodes above everything else
+    {
+        if(_workspace[i] instanceof VarNode)
+            _workspace[i].draw();
+    }
+    
+    CheckForNewErrors();
     
     document.getElementById("canvas").className = "";
     if(mouseDown && !(draggingEl instanceof NodePin))

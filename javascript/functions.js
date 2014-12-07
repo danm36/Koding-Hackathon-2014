@@ -8,7 +8,10 @@
  
 var FunctionNode = (function(_super)
 {
+    FunctionNode.funcTable = [];
+    
     __extends(FunctionNode, _super);
+    sidebar.AddToSidebar("FunctionNode", "Function", "Basic");
     function FunctionNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -16,8 +19,45 @@ var FunctionNode = (function(_super)
     
     FunctionNode.prototype.onCreate = function()
     {
-        this.displayName = "Function";
+        this.displayName = "func" + this.getId() + "()";
         this.outputs.push(new NodePin(this, "Out", "flow"));
+        
+        this.properties = {
+            name: { type: "string", value: "func" + this.getId() },
+            parameterCount: { type: "number", value: 0, min: 0, max: 32, step: 1 },
+        };
+        
+        FunctionNode.funcTable.push(this);
+    }
+    
+    FunctionNode.prototype.onDelete = function()
+    {
+        var index = FunctionNode.funcTable.indexOf(this);
+        if(index >= 0)
+            FunctionNode.funcTable.splice(index, 1);
+    }
+    
+    FunctionNode.prototype.reset = function()
+    {
+        this.displayName = this.properties.name.value + "()";
+       
+        if(this.properties.parameterCount.value != this.lastParamCount)
+        {
+            var outFlow = this.outputs[0];
+            this.outputs = [outFlow];
+            
+            for(var i = 0; i < this.properties.parameterCount.value; i++)
+                this.outputs.push(new NodePin(this, "Param " + (i + 1), "var"));
+            this.lastParamCount = this.properties.parameterCount.value;
+        }
+    }
+    
+    FunctionNode.prototype.execute = function(params)
+    {
+        for(var i = 1; i < this.outputs.length; i++)
+            this.setValue(this.outputs[i], params[i - 1]);
+        
+        this.outputs[0].fire();
     }
 	    		
     return FunctionNode;
@@ -39,21 +79,99 @@ var MainFunctionNode = (function(_super)
     
     MainFunctionNode.prototype.fire = function()
     {
-        if(_WCState === 0)
+        var self = this;
+        setTimeout(function()
         {
-            _WCState = 1;
-            var self = this;
-            setTimeout(function()
-            {
-                self.execute();
-            }, 100);
+            self.execute();
+        }, _playbackSpeed);
+    }
+ 
+    return MainFunctionNode;
+})(BasicNode);
+
+
+var CallFunctionNode = (function(_super)
+{
+    CallFunctionNode.waitStack = [];
+    
+    __extends(CallFunctionNode, _super);
+    sidebar.AddToSidebar("CallFunctionNode", "Call Function", "Basic");
+    function CallFunctionNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    CallFunctionNode.prototype.onCreate = function()
+    {
+        this.displayName = "Call function";
+        
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+        
+        this.properties = {
+            toCall: { type: "string", value: "" },
+        };
+    }
+    
+    CallFunctionNode.prototype.reset = function()
+    {
+        this.displayName = "Call " + this.properties.toCall.value + "()";
+        if(this.properties.toCall.value.trim() === "")
+        {
+            this.inputs = [this.inputs[0]];   
+            this.curError = "Missing function name to call";   
+            return;
         }
-        else
+        
+        if(this.properties.toCall.value != this.lastParamToCall)
         {
-            this.bIsActive = false;   
+            this.curError = undefined;
+            this.myFunc = undefined;
+        
+            for(var i = 0; i < FunctionNode.funcTable.length; i++)
+            {
+                if(FunctionNode.funcTable[i].properties.name.value == this.properties.toCall.value)
+                {
+                    this.myFunc = FunctionNode.funcTable[i];
+                    break;
+                }
+            }
+           
+            if(this.myFunc !== undefined)
+            {
+                if(this.myFunc.properties.parameterCount.value != this.lastParamCount)
+                {
+                    var inFlow = this.inputs[0];
+                    this.inputs = [inFlow];
+            
+                    for(var i = 0; i < this.myFunc.properties.parameterCount.value; i++)
+                        this.inputs.push(new NodePin(this, "Param " + (i + 1), "var"));
+                    this.lastParamCount = this.myFunc.properties.parameterCount.value;
+                }     
+            }
+            else
+            {
+                this.inputs = [this.inputs[0]];   
+                this.curError = "No function called '" + this.properties.toCall.value + "'";   
+            }
         }
     }
-
     
-    return MainFunctionNode;
+    CallFunctionNode.prototype.execute = function(fromStack)
+    {
+        if(fromStack === true)
+        {
+            this.outputs[0].fire();
+            return;
+        }
+        
+        var params = [];
+        for(var i = 1; i < this.inputs.length; i++)
+            params.push(this.getValue(this.inputs[i]));
+        
+        this.myFunc.fire(params);
+        CallFunctionNode.waitStack.push(this);
+    }
+	    		
+    return CallFunctionNode;
 })(BasicNode);

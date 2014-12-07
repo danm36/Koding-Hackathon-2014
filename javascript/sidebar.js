@@ -144,7 +144,6 @@ var sidebar = {
         ctx.fillStyle = this.myFillColor;
         ctx.fillRect(left, 0, this.width, canvas.height);
         
-        ctx.font = "10pt Trebuchet MS";
         var nextY = 0;
         ctx.translate(0, -this.scrollTop);
         for(var cat in this.categories)
@@ -156,6 +155,7 @@ var sidebar = {
             ctx.fillRect(left, nextY, this.width, 18);
             
             ctx.fillStyle = "#FFFFFF";
+            ctx.font = "10pt Trebuchet MS";
             ctx.fillText(cat.substr(0, 1).toUpperCase() + cat.substr(1), left + 4, nextY + 12);
             
             if(this.categories[cat].openinterp > 0.001)
@@ -192,6 +192,7 @@ var sidebar = {
                         ctx.fillRect(left + 32 + (128 * (i % 2)), nextY + 24 + 96 * Math.floor(i / 2), 64, 64);
                     }
                     
+                    ctx.font = "8pt Trebuchet MS";
                     ctx.fillText(this.categories[cat].nodes[i].name, left + 64 + (128 * (i % 2)) - ctx.measureText(this.categories[cat].nodes[i].name).width / 2, nextY + 104 + 96 * Math.floor(i / 2));
                 }
                 

@@ -11,6 +11,11 @@ var ctx;
 
 var _WCState = 0;
 var _workspace = [];
+var _jumpingto = undefined;
+var _jumpingbackto = undefined;
+var _playbackSpeed = 100;
+var _currentNode = undefined;
+var _breakpointNode = undefined;
 
 var mousePosition = new Vector(0, 0);
 var actualMousePosition = new Vector(0, 0);
@@ -42,6 +47,11 @@ var styleData = {
 	nodeFill: "#FFFFFF",
 	nodeFillActive: "#FF9900",
     nodeSelectionGlow: "#6666FF",
+    nodeErrorGlow: "#EE1111",
+    nodeSelectionErrorGlow: "#EE11FF",
+    
+    nodeBreakpointActive: "#FF0000",
+    nodeBreakpointInactive: "#444444",
     
     pinFillColor: {
         flow: "#000000",
