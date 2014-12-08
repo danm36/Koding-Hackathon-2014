@@ -40,7 +40,7 @@ var ConsoleLogNode = (function(_super)
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
-            val = '"' + this.properties.output.value + '"';
+            val = '"' + this.properties.output.value.replace(/\"/g, "\\\"") + '"';
         else
         {
             vars = val[0].vars;
@@ -87,7 +87,7 @@ var AlertNode = (function(_super)
         var vars = [];
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
-            val = '"' + this.properties.message.value + '"';
+            val = '"' + this.properties.message.value.replace(/\"/g, "\\\"") + '"';
         else
         {
             vars = val[0].vars;

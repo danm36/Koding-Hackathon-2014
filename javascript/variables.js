@@ -58,14 +58,14 @@ var VarNode = (function(_super)
             else if(this.value instanceof Object)
                 return [{code: "Object", vars: []}];
             else if(this.properties.value.type != "number" && (typeof this.properties.value.value == "string" || this.properties.value.value instanceof String))
-                return [{code: "\"" + this.properties.value.value + "\"", vars: []}];
+                return [{code: "\"" + this.properties.value.value.replace(/\"/g, "\\\"") + "\"", vars: []}];
             else
                 return [{code: String(this.properties.value.value), vars: []}];
         }
         
         var defVal = this.properties.value.value;
         if(this.properties.value.type != "number" && (typeof this.properties.value.value == "string" || this.properties.value.value instanceof String))
-            defVal = "\"" + this.properties.value.value + "\"";
+            defVal = "\"" + this.properties.value.value.replace(/\"/g, "\\\"") + "\"";
         
         return [{
             code: (this.properties.variableName.value.trim() != "" ? this.properties.variableName.value.trim() : this.type + this.getId()),

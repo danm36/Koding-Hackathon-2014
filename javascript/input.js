@@ -41,7 +41,7 @@ var ConfirmNode = (function(_super)
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
-            val = '"' + this.properties.message.value + '"';
+            val = '"' + this.properties.message.value.replace(/\"/g, "\\\"") + '"';
         else
         {
             if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
@@ -99,7 +99,7 @@ var PromptNode = (function(_super)
         
         var val = this.inputs[1].getCodeString();
         if(val == undefined)
-            val = '"' + this.properties.message.value + '"';
+            val = '"' + this.properties.message.value.replace(/\"/g, "\\\"") + '"';
         else
         {
             if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
@@ -109,7 +109,7 @@ var PromptNode = (function(_super)
         
         val = this.inputs[2].getCodeString();
         if(val === undefined)
-            val = '"' + this.properties.defaultval.value + '"';
+            val = '"' + this.properties.defaultval.value.replace(/\"/g, "\\\"") + '"';
         else
         {   
             if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
