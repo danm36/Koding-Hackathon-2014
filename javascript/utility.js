@@ -240,7 +240,7 @@ function SelectNode(node, bFocus)
     SelectNodeProperties(node);
     
     if(bFocus)
-        targetPanPosition = node.drawPos.Add(node.size.Divide(2)).Multiply(-1).Add(new Vector(canvas.width / 2 - sidebar.width / 2, canvas.height / 2));
+        targetPanPosition = (node.drawPos.Add(node.size.Divide(2)).Subtract(new Vector(canvas.width / 2, canvas.height / 2).Divide(actualZoomLevel))).Multiply(-actualZoomLevel);
 }
 
 
