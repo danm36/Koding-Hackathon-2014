@@ -9,7 +9,7 @@
 var StrToUpperCaseNode = (function(_super)
 {
     __extends(StrToUpperCaseNode, _super);
-    sidebar.AddToSidebar("StrToUpperCaseNode", "To Upper Case", "String");
+    sidebar.AddToSidebar("StrToUpperCaseNode", "To Upper Case", "String", "nodesStrings", 0, 0);
     function StrToUpperCaseNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -49,7 +49,7 @@ var StrToUpperCaseNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         
@@ -62,7 +62,7 @@ var StrToUpperCaseNode = (function(_super)
 var StrToLowerCaseNode = (function(_super)
 {
     __extends(StrToLowerCaseNode, _super);
-    sidebar.AddToSidebar("StrToLowerCaseNode", "To Lower Case", "String");
+    sidebar.AddToSidebar("StrToLowerCaseNode", "To Lower Case", "String", "nodesStrings", 64, 0);
     function StrToLowerCaseNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -102,7 +102,7 @@ var StrToLowerCaseNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         
@@ -115,7 +115,7 @@ var StrToLowerCaseNode = (function(_super)
 var StrConcatNode = (function(_super)
 {
     __extends(StrConcatNode, _super);
-    sidebar.AddToSidebar("StrConcatNode", "Concatenate", "String");
+    sidebar.AddToSidebar("StrConcatNode", "Concatenate", "String", "nodesStrings", 128, 0);
     function StrConcatNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -180,7 +180,7 @@ var StrConcatNode = (function(_super)
 var StrIndexOfNode = (function(_super)
 {
     __extends(StrIndexOfNode, _super);
-    sidebar.AddToSidebar("StrIndexOfNode", "Index Of", "String");
+    sidebar.AddToSidebar("StrIndexOfNode", "Index Of", "String", "nodesStrings", 196, 0);
     function StrIndexOfNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -226,7 +226,7 @@ var StrIndexOfNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;  
         }
         
@@ -237,7 +237,7 @@ var StrIndexOfNode = (function(_super)
             val = "/* Error, missing Search node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;  
         }    
         
@@ -252,7 +252,7 @@ var StrIndexOfNode = (function(_super)
 var StrLastIndexOfNode = (function(_super)
 {
     __extends(StrLastIndexOfNode, _super);
-    sidebar.AddToSidebar("StrLastIndexOfNode", "Last Index Of", "String");
+    sidebar.AddToSidebar("StrLastIndexOfNode", "Last Index Of", "String", "nodesStrings", 0, 64);
     function StrLastIndexOfNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -298,7 +298,7 @@ var StrLastIndexOfNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         
@@ -309,7 +309,7 @@ var StrLastIndexOfNode = (function(_super)
             val = "/* Error, missing Search node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         
@@ -325,7 +325,7 @@ var StrLastIndexOfNode = (function(_super)
 var SubstrNode = (function(_super)
 {
     __extends(SubstrNode, _super);
-    sidebar.AddToSidebar("SubstrNode", "Substring", "String");
+    sidebar.AddToSidebar("SubstrNode", "Substring", "String", "nodesStrings", 64, 64);
     function SubstrNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -376,7 +376,7 @@ var SubstrNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         
@@ -387,7 +387,7 @@ var SubstrNode = (function(_super)
             val = "/* Error, missing Start node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;  
         }
         
@@ -396,7 +396,7 @@ var SubstrNode = (function(_super)
         val = this.inputs[2].getCodeString();
         if(val !== undefined)
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code; 
             finalCode += ", " + val;
         }
@@ -412,7 +412,7 @@ var SubstrNode = (function(_super)
 var StrReplaceNode = (function(_super)
 {
     __extends(StrReplaceNode, _super);
-    sidebar.AddToSidebar("StrReplaceNode", "Replace", "String");
+    sidebar.AddToSidebar("StrReplaceNode", "Replace", "String", "nodesStrings", 128, 64);
     function StrReplaceNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -464,7 +464,7 @@ var StrReplaceNode = (function(_super)
             val = "/* Error, missing String node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;  
         }
         
@@ -475,7 +475,7 @@ var StrReplaceNode = (function(_super)
             val = "/* Error, missing Search node */";
         else if(val instanceof Object)
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         else
@@ -489,7 +489,7 @@ var StrReplaceNode = (function(_super)
             val = "/* Error, missing Replace node */";
         else if(val instanceof Object)
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code; 
         }
         else

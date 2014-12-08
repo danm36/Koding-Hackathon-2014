@@ -185,8 +185,7 @@ function CheckForNewErrors()
     //console.log(diffErrors);
     if(addedErrors.length > 0 || removedErrors.length > 0) //Change has happened
     {
-        $("#errorOutput").empty();
-        
+        $("#errorOutput").empty();      
         
         if(curErrors.length > 0)
         {
@@ -200,6 +199,7 @@ function CheckForNewErrors()
         else
         {
             $("#errorListTabBtn").removeClass("errored");
+            $("#errorOutput").append("<div class=\"logRow\" style=\"color: #1BAE1B;\">No errors!</div>");
         }
     }
         
@@ -207,14 +207,22 @@ function CheckForNewErrors()
     curErrors = [];
 }
 
-function RefreshCode(isAuto)
+function RefreshCode(isAuto, isDelayed)
 {
     if(isAuto === true && !$("#codeAutoRefreshCheck").is(":checked"))
         return;
     
-    if(lastErrors.length > 0 && isAuto !== true)
+    if(isAuto === true && isDelayed !== true)
     {
-        console.warn("Failed to generate code - There are some errors present");
+        //So errors can self resolve
+        setTimeout(function() { RefreshCode(true, true); }, 50);
+        return;
+    }
+    
+    if(lastErrors.length > 0)
+    {
+        if(isAuto !== true)
+            console.warn("Failed to generate code - There are some errors present");
         return;
     }
     

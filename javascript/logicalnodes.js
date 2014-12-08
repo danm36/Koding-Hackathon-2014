@@ -9,7 +9,7 @@
 var EqualToNode = (function(_super)
 {
     __extends(EqualToNode, _super);
-    sidebar.AddToSidebar("EqualToNode", "Equal To (==)", "Logic");
+    sidebar.AddToSidebar("EqualToNode", "Equal To (==)", "Logic", "nodesLogic", 0, 0);
     function EqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -41,12 +41,16 @@ var EqualToNode = (function(_super)
     EqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + " == ";
         
@@ -54,11 +58,14 @@ var EqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return EqualToNode;
@@ -67,7 +74,7 @@ var EqualToNode = (function(_super)
 var StrictEqualToNode = (function(_super)
 {
     __extends(StrictEqualToNode, _super);
-    sidebar.AddToSidebar("StrictEqualToNode", "Strict Equal To (===)", "Logic");
+    sidebar.AddToSidebar("StrictEqualToNode", "Strict Equal To (===)", "Logic", "nodesLogic", 64, 0);
     function StrictEqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -99,12 +106,16 @@ var StrictEqualToNode = (function(_super)
     StrictEqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
+        }
         
         finalCode += val + " === ";
         
@@ -112,11 +123,14 @@ var StrictEqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code; 
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return StrictEqualToNode;
@@ -125,7 +139,7 @@ var StrictEqualToNode = (function(_super)
 var NotEqualToNode = (function(_super)
 {
     __extends(NotEqualToNode, _super);
-    sidebar.AddToSidebar("NotEqualToNode", "Not Equal To (!=)", "Logic");
+    sidebar.AddToSidebar("NotEqualToNode", "Not Equal To (!=)", "Logic", "nodesLogic", 128, 0);
     function NotEqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -157,12 +171,16 @@ var NotEqualToNode = (function(_super)
     NotEqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + " != ";
         
@@ -170,11 +188,14 @@ var NotEqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
     
     return NotEqualToNode;
@@ -183,7 +204,7 @@ var NotEqualToNode = (function(_super)
 var StrictNotEqualToNode = (function(_super)
 {
     __extends(StrictNotEqualToNode, _super);
-    sidebar.AddToSidebar("StrictNotEqualToNode", "Strict Not Equal To (!==)", "Logic");
+    sidebar.AddToSidebar("StrictNotEqualToNode", "Strict Not Equal To (!==)", "Logic", "nodesLogic", 196, 0);
     function StrictNotEqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -215,12 +236,16 @@ var StrictNotEqualToNode = (function(_super)
     StrictNotEqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + " !== ";
         
@@ -228,11 +253,14 @@ var StrictNotEqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return StrictNotEqualToNode;
@@ -241,7 +269,7 @@ var StrictNotEqualToNode = (function(_super)
 var GreaterThanNode = (function(_super)
 {
     __extends(GreaterThanNode, _super);
-    sidebar.AddToSidebar("GreaterThanNode", "Greater Than (>)", "Logic");
+    sidebar.AddToSidebar("GreaterThanNode", "Greater Than (>)", "Logic", "nodesLogic", 0, 64);
     function GreaterThanNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -273,12 +301,16 @@ var GreaterThanNode = (function(_super)
     GreaterThanNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + " > ";
         
@@ -286,11 +318,14 @@ var GreaterThanNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return GreaterThanNode;
@@ -299,7 +334,7 @@ var GreaterThanNode = (function(_super)
 var GreaterThanEqualToNode = (function(_super)
 {
     __extends(GreaterThanEqualToNode, _super);
-    sidebar.AddToSidebar("GreaterThanEqualToNode", "Greater Than/Equal (>=)", "Logic");
+    sidebar.AddToSidebar("GreaterThanEqualToNode", "Greater Than/Equal (>=)", "Logic", "nodesLogic", 64, 64);
     function GreaterThanEqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -331,12 +366,16 @@ var GreaterThanEqualToNode = (function(_super)
     GreaterThanEqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + " >= ";
         
@@ -344,11 +383,14 @@ var GreaterThanEqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code; 
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return GreaterThanEqualToNode;
@@ -357,7 +399,7 @@ var GreaterThanEqualToNode = (function(_super)
 var LessThanNode = (function(_super)
 {
     __extends(LessThanNode, _super);
-    sidebar.AddToSidebar("LessThanNode", "Less Than (<)", "Logic");
+    sidebar.AddToSidebar("LessThanNode", "Less Than (<)", "Logic", "nodesLogic", 128, 64);
     function LessThanNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -389,12 +431,16 @@ var LessThanNode = (function(_super)
     LessThanNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code; 
+        }
         
         finalCode += val + " < ";
         
@@ -402,11 +448,14 @@ var LessThanNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return LessThanNode;
@@ -415,7 +464,7 @@ var LessThanNode = (function(_super)
 var LessThanEqualToNode = (function(_super)
 {
     __extends(LessThanEqualToNode, _super);
-    sidebar.AddToSidebar("LessThanEqualToNode", "Less Than/Equal (<=)", "Logic");
+    sidebar.AddToSidebar("LessThanEqualToNode", "Less Than/Equal (<=)", "Logic", "nodesLogic", 196, 64);
     function LessThanEqualToNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -447,12 +496,16 @@ var LessThanEqualToNode = (function(_super)
     LessThanEqualToNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + " <= ";
         
@@ -460,11 +513,14 @@ var LessThanEqualToNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return LessThanEqualToNode;
@@ -473,7 +529,7 @@ var LessThanEqualToNode = (function(_super)
 var AndNode = (function(_super)
 {
     __extends(AndNode, _super);
-    sidebar.AddToSidebar("AndNode", "And (&&)", "Logic");
+    sidebar.AddToSidebar("AndNode", "And (&&)", "Logic", "nodesLogic", 0, 128);
     function AndNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -505,12 +561,16 @@ var AndNode = (function(_super)
     AndNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
+        }
         
         finalCode += val + " && ";
         
@@ -518,11 +578,14 @@ var AndNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return AndNode;
@@ -531,7 +594,7 @@ var AndNode = (function(_super)
 var OrNode = (function(_super)
 {
     __extends(OrNode, _super);
-    sidebar.AddToSidebar("OrNode", "Or (||)", "Logic");
+    sidebar.AddToSidebar("OrNode", "Or (||)", "Logic", "nodesLogic", 64, 128);
     function OrNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -563,12 +626,16 @@ var OrNode = (function(_super)
     OrNode.prototype.getCodeString = function()
     {    
         var finalCode = "(";
+        var vars = [];
         
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
         finalCode += val + " || ";
         
@@ -576,11 +643,14 @@ var OrNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing B node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
+        }
         
         finalCode += val + ")";
         
-        return [{ code: finalCode }];   
+        return [{ code: finalCode, vars: vars }];   
     }
 	    		
     return OrNode;
@@ -589,7 +659,7 @@ var OrNode = (function(_super)
 var NotNode = (function(_super)
 {
     __extends(NotNode, _super);
-    sidebar.AddToSidebar("NotNode", "Not (!)", "Logic");
+    sidebar.AddToSidebar("NotNode", "Not (!)", "Logic", "nodesLogic", 128, 128);
     function NotNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -617,13 +687,17 @@ var NotNode = (function(_super)
     
     NotNode.prototype.getCodeString = function()
     {    
+        var vars = []
         var val = this.inputs[0].getCodeString();
         if(val === undefined)
             val = "/* Error, missing A node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;  
+        }
         
-        return [{ code: !val }];   
+        return [{ code: "!" + val, vars: vars }];   
     }
 	    		
     return NotNode;

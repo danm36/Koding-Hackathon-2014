@@ -9,7 +9,7 @@
 var ConsoleLogNode = (function(_super)
 {
     __extends(ConsoleLogNode, _super);
-    sidebar.AddToSidebar("ConsoleLogNode", "console.log()", "Output");
+    sidebar.AddToSidebar("ConsoleLogNode", "console.log()", "Output", "nodesOutput", 0, 0);
     function ConsoleLogNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -57,7 +57,7 @@ var ConsoleLogNode = (function(_super)
 var AlertNode = (function(_super)
 {
     __extends(AlertNode, _super);
-    sidebar.AddToSidebar("AlertNode", "Alert", "Output");
+    sidebar.AddToSidebar("AlertNode", "Alert", "Output", "nodesOutput", 64, 0);
     function AlertNode(spawnPos)
 	{
         _super.call(this, spawnPos);

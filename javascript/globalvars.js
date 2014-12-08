@@ -35,10 +35,10 @@ var styleData = {
 	
 	bgGradTopNorm: "#EEEEFF",
 	bgGradBotNorm: "#CCCCFF",
-	bgGradTopSimu: "#FFEFEF",
-	bgGradBotSimu: "#FFCCCC",
-    bgGradTopEdit: "#EEFFEE",
-	bgGradBotEdit: "#BBCCBB",
+    bgGradTopSimu: "#EEFFEE",
+	bgGradBotSimu: "#BBCCBB",
+	bgGradTopBreak: "#FFEFEF",
+	bgGradBotBreak: "#FFCCCC",
 	
 	bgGradTopInterp: "#EEEEFF", //The actual values to draw the background with, which are interpolated
 	bgGradBotInterp: "#CCCCFF", //from the values above

@@ -9,7 +9,7 @@
 var VarNode = (function(_super)
 {
     __extends(VarNode, _super);
-    sidebar.AddToSidebar("VarNode", "Var (Any type)", "Variables");
+    sidebar.AddToSidebar("VarNode", "Var (Any type)", "Variables", "nodesVars", 0, 0);
     function VarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -176,7 +176,7 @@ var VarNode = (function(_super)
 var BoolVarNode = (function(_super)
 {
     __extends(BoolVarNode, _super);
-    sidebar.AddToSidebar("BoolVarNode", "Boolean", "Variables");
+    sidebar.AddToSidebar("BoolVarNode", "Boolean", "Variables", "nodesVars", 64, 0);
     function BoolVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -213,7 +213,7 @@ var BoolVarNode = (function(_super)
 var StringVarNode = (function(_super)
 {
     __extends(StringVarNode, _super);
-    sidebar.AddToSidebar("StringVarNode", "String", "Variables");
+    sidebar.AddToSidebar("StringVarNode", "String", "Variables", "nodesVars", 128, 0);
     function StringVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -250,7 +250,7 @@ var StringVarNode = (function(_super)
 var NumberVarNode = (function(_super)
 {
     __extends(NumberVarNode, _super);
-    sidebar.AddToSidebar("NumberVarNode", "Number", "Variables");
+    sidebar.AddToSidebar("NumberVarNode", "Number", "Variables", "nodesVars", 196, 0);
     function NumberVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -287,7 +287,7 @@ var NumberVarNode = (function(_super)
 var ObjectVarNode = (function(_super)
 {
     __extends(ObjectVarNode, _super);
-    sidebar.AddToSidebar("ObjectVarNode", "Object", "Variables");
+    sidebar.AddToSidebar("ObjectVarNode", "Object", "Variables", "nodesVars", 0, 64);
     function ObjectVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -324,7 +324,7 @@ var ObjectVarNode = (function(_super)
 var ArrayVarNode = (function(_super)
 {
     __extends(ArrayVarNode, _super);
-    sidebar.AddToSidebar("ArrayVarNode", "Array", "Variables");
+    sidebar.AddToSidebar("ArrayVarNode", "Array", "Variables", "nodesVars", 64, 64);
     function ArrayVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);

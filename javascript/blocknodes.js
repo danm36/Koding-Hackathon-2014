@@ -9,7 +9,7 @@
 var IfNode = (function(_super)
 {
     __extends(IfNode, _super);
-    sidebar.AddToSidebar("IfNode", "If", "Flow");
+    sidebar.AddToSidebar("IfNode", "If", "Flow", "nodesCore", 0, 64);
     function IfNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -53,7 +53,7 @@ var IfNode = (function(_super)
             val = "false /* Error: Missing node connection */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
             val = val[0].code; 
         }
         finalCode += val + ")";
@@ -77,7 +77,7 @@ var IfNode = (function(_super)
             }
             result.push({exdent: true});
             
-            if(falseBranch !== undefined)
+            if(falseBranch !== undefined && falseBranch[0] !== undefined)
             {
                 result.push({code: "else", indent: true, dontsemi: true });
                 for(var i = 0; i < falseBranch.length; i++)
@@ -102,7 +102,7 @@ var IfNode = (function(_super)
 var EndIfNode = (function(_super)
 {
     __extends(EndIfNode, _super);
-    sidebar.AddToSidebar("EndIfNode", "End If", "Flow");
+    sidebar.AddToSidebar("EndIfNode", "End If", "Flow", "nodesCore", 64, 64);
     function EndIfNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -135,7 +135,7 @@ var WhileNode = (function(_super)
     WhileNode.stack = [];
     
     __extends(WhileNode, _super);
-    sidebar.AddToSidebar("WhileNode", "While", "Flow");
+    sidebar.AddToSidebar("WhileNode", "While", "Flow", "nodesCore", 128, 64);
     function WhileNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -184,7 +184,7 @@ var WhileNode = (function(_super)
             val = "false /* Error: Missing node connection */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
             val = val[0].code;   
         }
         finalCode += val + ")";
@@ -198,7 +198,7 @@ var WhileNode = (function(_super)
 var EndWhileNode = (function(_super)
 {
     __extends(EndWhileNode, _super);
-    sidebar.AddToSidebar("EndWhileNode", "End While", "Flow");
+    sidebar.AddToSidebar("EndWhileNode", "End While", "Flow", "nodesCore", 196, 64);
     function EndWhileNode(spawnPos)
 	{
         _super.call(this, spawnPos);

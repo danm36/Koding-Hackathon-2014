@@ -168,69 +168,43 @@ function onLoad()
                     if(!mouseDown)
                         ctrlDownOnDrag = true;
                     break;
+                case 32: //[space] - Run/Pause simulation
+                    RunPauseSimulation();
+					break;
                 case 46: //[del] - Delete selected node
                     if(selectedEl instanceof MainFunctionNode)
                         break;
                     
                     DeleteNode(selectedEl);
                     break;
-                case 70: //[f] - Reset camera
+                case 66: //[b] - Toggle breakpoint
+                    if(selectedEl !== undefined && !(selectedEl instanceof MainFunctionNode))
+                        selectedEl.bIsBreakpoint = !selectedEl.bIsBreakpoint;
+                    break;
+                case 81: //[q] - Stop
+                    StopSimulation();
+                    break;  
+                case 82: //[r] - Reset camera
                     ResetCamera();
                     break;
-				case 82: //[r] - Run simulation
-                    if(_WCState !== 1)
-                        RunSimulation();
-                    else
-                        StopSimulation();
-					break;
+                case 83: //[s] - Step
+                    StepSimulation();
+                    break;
                     
                 //Temp
                 
-                case 49:
-                    var newNode = new BasicNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
+                case 49: //[1] - Console tab
+                    $("#consoleTabBtn").click();
                     break;
-                case 50:
-                    var newNode = new ConsoleLogNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
+                case 50: //[2] - Errors tab
+                    $("#errorListTabBtn").click();
                     break;
-                case 51:
-                    var newNode = new PromptNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
-                    break;
-                case 52:
-                    var newNode = new IfNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
-                    break;
-                case 53:
-                    var newNode = new EndIfNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
-                    break;
-                case 54:
-                    _workspace.push(draggingEl);
-                    break;
-                case 55:
-                    _workspace.push(draggingEl);
-                    break;
-                case 56:
-                    _workspace.push(draggingEl);
-                    break;
-                case 57:
-                    _workspace.push(draggingEl);
-                    break;
-                case 48:
-                    var newNode = new VarNode(actualPanPosition.Multiply(-1));
-                    newNode.drawPos = newNode.drawPos.Add(new Vector(canvas.width / 2 - newNode.size.x / 2, canvas.height / 2 - newNode.size.y / 2));
-                    _workspace.push(newNode);
+                case 51: //[3] - Generated code tab
+                    $("#generatedCodeTabBtn").click();
                     break;
 			}
             
-            //console.log(e.which);
+            console.log(e.which);
 		});
         
         window.addEventListener('keyup', function(e)
@@ -256,6 +230,8 @@ function onLoad()
 	Init();
 	Draw();
     
+    help(true);    
+    
     _workspace.push(new MainFunctionNode());
 }
 
@@ -273,8 +249,8 @@ function Draw()
 	}
 	else if(_WCState == 2)
 	{
-		styleData.bgGradTopInterp = ColorLerp(styleData.bgGradTopInterp, styleData.bgGradTopEdit, 0.2);
-		styleData.bgGradBotInterp = ColorLerp(styleData.bgGradBotInterp, styleData.bgGradBotEdit, 0.2);
+		styleData.bgGradTopInterp = ColorLerp(styleData.bgGradTopInterp, styleData.bgGradTopBreak, 0.2);
+		styleData.bgGradBotInterp = ColorLerp(styleData.bgGradBotInterp, styleData.bgGradBotBreak, 0.2);
 	}
 	else
 	{
@@ -286,11 +262,6 @@ function Draw()
 
     ctx.fillStyle = styleData.bgFill;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	
-	//A little watermark
-	ctx.font = "10pt Trebuchet MS";
-	ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-	ctx.fillText("WireCoder Beta - Daniel Masterson", canvas.width - 212, canvas.height - 4);
 	
 	//Lerp pan and zoom positions for smooth motion
 	actualPanPosition = actualPanPosition.Lerp(targetPanPosition, 0.1);
@@ -334,6 +305,11 @@ function Draw()
 
     sidebar.UpdateSidebar();
     sidebar.DrawSidebar();
+    
+    //A little watermark
+	ctx.font = "10pt Trebuchet MS";
+	ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+	ctx.fillText("WireCoder Alpha by Daniel Masterson", 4, 12);
 							
 	window.requestAnimationFrame(Draw);
 }

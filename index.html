@@ -37,10 +37,18 @@ Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk23
     
     <div id="drawer">
         <div id="mainArea">
-            <div id="tabs">
-                <span class="active" data-tab="console">Console</span>
-                <span id="errorListTabBtn" data-tab="errorOutput">Error List</span>
-                <span data-tab="generatedCode">Generated Code</span>
+            <div id="tabZone">
+                <div id="simSettings">
+                    <button class="stepBtn" onclick="StepSimulation();"></button>
+                    <button class="playPauseBtn playBtn" onclick="RunPauseSimulation();"></button>
+                    <button class="stopBtn" onclick="StopSimulation();"></button>
+                    Execution Speed: <input type="number" onkeyup="SetExecSpeed(this);" onchange="SetExecSpeed(this);" value="100" min="1" step="1" />
+                </div>
+                <div id="tabs">
+                    <span id="consoleTabBtn" class="active" data-tab="console">Console</span>
+                    <span id="errorListTabBtn" data-tab="errorOutput">Error List</span>
+                    <span id="generatedCodeTabBtn" data-tab="generatedCode">Generated Code</span>
+                </div> 
             </div>
             <div id="drawerContent">
                 <div id="console" class="active">
@@ -48,6 +56,7 @@ Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk23
                     <div id="consoleInputContainer"><span id="consoleInputIndicator">&gt;</span><input type="text" id="consoleInput" onkeydown="drawerConsoleKeyDown(event);" /></div>
                 </div>
                 <div id="errorOutput">
+                    <div class="logRow" style="color: #1BAE1B;">No errors!</div>
                 </div>
                 <div id="generatedCode">
                     <div id="codeGenControlPanel">

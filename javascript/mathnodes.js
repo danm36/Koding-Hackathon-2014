@@ -9,7 +9,7 @@
 var SetVarNode = (function(_super)
 {
     __extends(SetVarNode, _super);
-    sidebar.AddToSidebar("SetVarNode", "Set Var", "Basic");
+    sidebar.AddToSidebar("SetVarNode", "Set Var", "Basic", "nodesCore", 196, 0);
     function SetVarNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -49,9 +49,10 @@ var SetVarNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing result node */";
         else
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
-        
-        vars.concat(val[0].vars);
+        }
         
         finalCode += val + " = ";
         
@@ -59,9 +60,11 @@ var SetVarNode = (function(_super)
         if(val === undefined)
             val = "/* Error, missing var node */";
         else
-            val = val[0].code;   
+        {
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code; 
+        }
         
-        vars.concat(val[0].vars);
         finalCode += val;
         
         return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
@@ -73,7 +76,7 @@ var SetVarNode = (function(_super)
 var AddNode = (function(_super)
 {
     __extends(AddNode, _super);
-    sidebar.AddToSidebar("AddNode", "Add (+)", "Math");
+    sidebar.AddToSidebar("AddNode", "Add (+)", "Math", "nodesMath", 0, 0);
     function AddNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -112,7 +115,7 @@ var AddNode = (function(_super)
             val = "/* Error, missing A node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
             val = val[0].code;          
         }
         
@@ -123,7 +126,7 @@ var AddNode = (function(_super)
             val = "/* Error, missing B node */";
         else
         {     
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);  
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);  
             val = val[0].code;
         }
         
@@ -138,7 +141,7 @@ var AddNode = (function(_super)
 var SubtractNode = (function(_super)
 {
     __extends(SubtractNode, _super);
-    sidebar.AddToSidebar("SubtractNode", "Subtract (-)", "Math");
+    sidebar.AddToSidebar("SubtractNode", "Subtract (-)", "Math", "nodesMath", 64, 0);
     function SubtractNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -177,7 +180,7 @@ var SubtractNode = (function(_super)
             val = "/* Error, missing A node */";
         else
         {  
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
             val = val[0].code;
         }
         
@@ -188,7 +191,7 @@ var SubtractNode = (function(_super)
             val = "/* Error, missing B node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -203,7 +206,7 @@ var SubtractNode = (function(_super)
 var MultiplyNode = (function(_super)
 {
     __extends(MultiplyNode, _super);
-    sidebar.AddToSidebar("MultiplyNode", "Multiply (*)", "Math");
+    sidebar.AddToSidebar("MultiplyNode", "Multiply (*)", "Math", "nodesMath", 128, 0);
     function MultiplyNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -242,7 +245,7 @@ var MultiplyNode = (function(_super)
             val = "/* Error, missing A node */";
         else
         {   
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -253,7 +256,7 @@ var MultiplyNode = (function(_super)
             val = "/* Error, missing B node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -268,7 +271,7 @@ var MultiplyNode = (function(_super)
 var DivideNode = (function(_super)
 {
     __extends(DivideNode, _super);
-    sidebar.AddToSidebar("DivideNode", "Divide (/)", "Math");
+    sidebar.AddToSidebar("DivideNode", "Divide (/)", "Math", "nodesMath", 196, 0);
     function DivideNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -307,7 +310,7 @@ var DivideNode = (function(_super)
             val = "/* Error, missing A node */";
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -318,7 +321,7 @@ var DivideNode = (function(_super)
             val = "/* Error, missing B node */";
         else
         {  
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -333,7 +336,7 @@ var DivideNode = (function(_super)
 var ModuloNode = (function(_super)
 {
     __extends(ModuloNode, _super);
-    sidebar.AddToSidebar("ModuloNode", "Modulo (%)", "Math");
+    sidebar.AddToSidebar("ModuloNode", "Modulo (%)", "Math", "nodesMath", 0, 64);
     function ModuloNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -372,7 +375,7 @@ var ModuloNode = (function(_super)
             val = "/* Error, missing A node */";
         else
         {       
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -383,7 +386,7 @@ var ModuloNode = (function(_super)
             val = "/* Error, missing B node */";
         else
         { 
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         
@@ -398,7 +401,7 @@ var ModuloNode = (function(_super)
 var IncrementNode = (function(_super)
 {
     __extends(IncrementNode, _super);
-    sidebar.AddToSidebar("IncrementNode", "Increment (++)", "Math");
+    sidebar.AddToSidebar("IncrementNode", "Increment (++)", "Math", "nodesMath", 64, 64);
     function IncrementNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -443,7 +446,7 @@ var IncrementNode = (function(_super)
 var DecrementNode = (function(_super)
 {
     __extends(DecrementNode, _super);
-    sidebar.AddToSidebar("DecrementNode", "Decrement (--)", "Math");
+    sidebar.AddToSidebar("DecrementNode", "Decrement (--)", "Math", "nodesMath", 128, 64);
     function DecrementNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -488,7 +491,7 @@ var DecrementNode = (function(_super)
 var IncrementInlineNode = (function(_super)
 {
     __extends(IncrementInlineNode, _super);
-    sidebar.AddToSidebar("IncrementInlineNode", "Increment Inline (++)", "Math");
+    sidebar.AddToSidebar("IncrementInlineNode", "Increment Inline (++)", "Math", "nodesMath", 196, 64);
     function IncrementInlineNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -538,7 +541,7 @@ var IncrementInlineNode = (function(_super)
 var DecrementInlineNode = (function(_super)
 {
     __extends(DecrementInlineNode, _super);
-    sidebar.AddToSidebar("DecrementInlineNode", "Decrement Inline (--)", "Math");
+    sidebar.AddToSidebar("DecrementInlineNode", "Decrement Inline (--)", "Math", "nodesMath", 0, 128);
     function DecrementInlineNode(spawnPos)
 	{
         _super.call(this, spawnPos);

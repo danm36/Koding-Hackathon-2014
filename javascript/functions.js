@@ -11,7 +11,7 @@ var FunctionNode = (function(_super)
     FunctionNode.funcTable = [];
     
     __extends(FunctionNode, _super);
-    sidebar.AddToSidebar("FunctionNode", "Function", "Basic");
+    sidebar.AddToSidebar("FunctionNode", "Function", "Basic", "nodesCore", 64, 0);
     function FunctionNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -105,7 +105,7 @@ var CallFunctionNode = (function(_super)
     CallFunctionNode.waitStack = [];
     
     __extends(CallFunctionNode, _super);
-    sidebar.AddToSidebar("CallFunctionNode", "Call Function", "Basic");
+    sidebar.AddToSidebar("CallFunctionNode", "Call Function", "Basic", "nodesCore", 128, 0);
     function CallFunctionNode(spawnPos)
 	{
         _super.call(this, spawnPos);

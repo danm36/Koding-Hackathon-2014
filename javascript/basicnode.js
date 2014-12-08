@@ -10,7 +10,7 @@ var BasicNode = (function()
 {
     BasicNode.sTotalNodes = 0;
     
-    sidebar.AddToSidebar("BasicNode", "Relay", "Basic");
+    sidebar.AddToSidebar("BasicNode", "Relay", "Basic", "nodesCore", 0, 0);
     function BasicNode(spawnPos)
 	{
         this.setId(BasicNode.sTotalNodes++);
@@ -51,7 +51,7 @@ var BasicNode = (function()
     
     BasicNode.prototype.fire = function(params)
     {
-        if(_WCState !== 1)
+        if(_WCState !== 1 && _WCState !== 3)
         {
             this.bIsActive = false;
             return;
@@ -84,12 +84,9 @@ var BasicNode = (function()
             this.justJumpedTo = true;
         } 
         
-        if(this.bIsBreakpoint && _breakpointNode === undefined)
+        if((this.bIsBreakpoint || _WCState === 3) && _breakpointNode === undefined )
         {
-            _WCState = 2;
-            SelectNode(this, true);
-            _breakpointNode = this;
-            console.info("[" + this.constructor.name + "@" + this.getId() + "] Breakpoint triggered");
+            PauseSimulation(true, true);        
             return;
         }
         
@@ -133,6 +130,7 @@ var BasicNode = (function()
            mousePosition.x < this.drawPos.x + 18 && mousePosition.y < this.drawPos.y + 20)
         {
             this.bIsBreakpoint = !this.bIsBreakpoint;
+            RefreshCode(true);
             return true;
         }
         
@@ -141,7 +139,7 @@ var BasicNode = (function()
     
     BasicNode.prototype.getCodeString = function()
     {
-        return [{code: this.bIsBreakpoint ? "/* TriggerBreakpoint */" : "/* " + this.constructor.name + " is missing code string */" }].concat(this.outputs[0].getCodeString());   
+        return [{code: (this.bIsBreakpoint ? "/* TriggerBreakpoint */" : (this.constructor.name == "BasicNode" ? undefined : "/* " + this.constructor.name + " is missing code string */")), dontsemi: true }].concat(this.outputs[0].getCodeString());   
     }
     
 	BasicNode.prototype.update = function()
@@ -441,6 +439,10 @@ var NodePin = (function()
                 else
                 {
                     console.info("Program simulation terminated");
+                    $(".playPauseBtn").removeClass("pauseBtn").addClass("playBtn");
+                    $(".stepBtn").removeClass("active");
+                    _breakpointNode = undefined;
+                    _currentNode = undefined;
                     _WCState = 0;  
                 }
                 

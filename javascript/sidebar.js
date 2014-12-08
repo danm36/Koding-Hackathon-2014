@@ -3,12 +3,14 @@ var sidebar = {
     myGlobalAlpha: 1,
     width: 256,
     scrollTop: 0,
+    imageSources: [],
     
     categories: { },
     
-    AddToSidebar: function(node, name, cat)
+    AddToSidebar: function(node, name, cat, image, imgX, imgY)
     {
         if(this.categories[cat] === undefined)
+        {
             this.categories[cat] = {
                 state: "closed",
                 hovering: false,
@@ -17,13 +19,38 @@ var sidebar = {
                 myTop: 0,
                 nodes: []
             };
+        }
+        
+        if(image !== undefined)
+        {
+            var bFound = false;
+            for(var i = 0; i < this.imageSources.length; i++)
+            {
+                if(this.imageSources[i].name == image)
+                {
+                    bFound = true;
+                    image = this.imageSources[i].data;
+                    break;
+                }
+            }
+        
+            if(!bFound)
+            {
+                var imgDat = new Image();
+                imgDat.src = "images/" + image + ".png";
+                this.imageSources.push({name: image, data: imgDat});
+                image = imgDat;
+            }
+        }
         
         this.categories[cat].nodes.push({
             node: node,
             name: name,
             hovering: false,
             hoverTimer: 0,
-            img: undefined
+            img: image,
+            imgX: imgX,
+            imgY: imgY,
         });
     },
     
@@ -195,8 +222,8 @@ var sidebar = {
                     
                     ctx.fillStyle = "#FFFFFF";
                     if(this.categories[cat].nodes[i].img !== undefined)
-                    {
-                        ctx.drawImage(this.categories[cat].nodes[i].img, left + 12 + (86 * (i % 3)), nextY + 24 + 96 * Math.floor(i / 3), 64, 64);
+                    {                        
+                        ctx.drawImage(this.categories[cat].nodes[i].img, this.categories[cat].nodes[i].imgX, this.categories[cat].nodes[i].imgY, 64, 64, left + 12 + (86 * (i % 3)), nextY + 24 + 96 * Math.floor(i / 3), 64, 64);
                     }
                     else
                     {

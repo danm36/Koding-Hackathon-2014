@@ -6,6 +6,68 @@
  * Written by Daniel Masterson 446870
  *****************************************************************************************************************************************/
 
+//Help documentation because I'm lazy
+function help(bIsInitial)
+{
+    console.info("Wirecoder Alpha for the Koding Hackathon 2014");
+    console.info("Made by team Axon (Daniel Masterson) - https://github.com/koding/global.hackathon/");
+    console.info("-----------------------------------------------------------------------------------");
+    console.info("&nbsp;");
+    console.info("This is the help document for the program, and can be brought up by calling 'help()' in this console.");
+    console.info("&nbsp;");
+    console.info("Wirecoder is a visual wire and node based scripting tool that allows you to script and generate JavaScript.");
+    console.info("While it is in its early stages, there aren't many nodes to chose from, but this should increase over time.");
+    console.info("&nbsp;");
+    console.info("To begin, drag in a node from the sidebar to the right. Open a category by clicking it, then click and drag a node from the sidebar.");
+    console.info("Depending on the node, it will have different types of pins on both the left and right sides of it, differentiated by colour and shape.");
+    console.info("You may only connect pins of the same type, or of a supported type, together.");
+    console.info("Black triangular pins indicate program flow and are key to program execution.");
+    console.info("Purple square nodes are generic var nodes, and can accept and pass to any variable.");
+    console.info("Blue square nodes, on the other hand, only function with numberic variables (Or the generic variable).");
+    console.info("Square pin's colour match the variable type they are associated to, helping you plan connections.");
+    console.info("&nbsp;");
+    console.info("To connect nodes together, simply drag from one pin to another.");
+    console.info("To move nodes, hold the ctrl key before dragging the node.");
+    console.info("Click a node to select it. Its modifiable properties (If any) will display in the bottom right and the node will gain a blue (Or pink) glow.");
+    console.info("Changing these properties will change the node directly, and some properties can substitute for pins.");
+    console.info("With a node selected, press the 'del' key to delete it.");
+    console.info("If a node has errored, it will have a red glow (or pink if selected). You can see its problems in the errors tab.");
+    console.info("&nbsp;");
+    console.info("Click the play button on the drawer at the bottom, or press space, to run your program.");
+    console.info("Click the button or press space again to pause execution, allowing you to step through the code.");
+    console.info("Click the step button (Blue play button) or press the 's' key to step.");
+    console.info("Click the stop button or press the 'q' key to stop execution.");
+    console.info("Any variables will reset to their 'value' property when execution starts again.");
+    console.info("&nbsp;");
+    console.info("Tips:");
+    console.info("-----");
+    console.info("&nbsp;");
+    console.info("&gt; Tick this isConst property in variables that represent constant values. You won't be able to set them, but the code generation gets a lot nicer.");
+    console.info("&gt; ALWAYS link 'flow' nodes to their respective end nodes (If -> EndIf, While -> EndWhile etc) or the program won't run as you expect.");
+    console.info("&gt; Directly linking the false pin on If/EndIf nodes will not generate an else block.");
+    console.info("&gt; While it is sometimes possible, directly linking to variable pins without an intemediary variable can cause issues.");
+    console.info("&nbsp;");
+    console.info("Key bindings:");
+    console.info("--------------");
+    console.info(" space - Run/Pause execution");
+    console.info(" q     - Stop execution");
+    console.info(" s     - Step execution (When paused)")
+    console.info(" r     - Resets camera (Focuses on Main function)");
+    console.info(" LMB   - Select node/Drag node if ctrl held down");
+    console.info(" del   - Delete selected node");
+    console.info(" b     - Toggle breakpoint on selected node");
+    console.info(" ctrl  - (Hold down) Drag a node with the mouse instead of selecting it");
+    console.info(" 1,2,3 - Selects Console, Error List or Generated Code tab respectively");
+    console.info("&nbsp;");
+    console.info("&nbsp;");
+    if(bIsInitial === true)
+    {
+        console.warn("If this is the first thing you see, you might want to scroll up.");
+        console.info("&nbsp;");
+        console.info("&nbsp;");
+    }
+}
+
 //Resets the camera position and zoom. If bQuick is true, doesn't animate the transition
 function ResetCamera(bQuick)
 {
@@ -27,6 +89,19 @@ function OnResize()
     canvas.style.height = canvas.height + "px";
 }
 
+function SetExecSpeed(el)
+{
+    _playbackSpeed = el.value;   
+}
+
+function RunPauseSimulation()
+{
+    if(_WCState === 1)
+        PauseSimulation();
+    else
+        RunSimulation();
+}
+
 function RunSimulation()
 {
     if(lastErrors.length > 0)
@@ -35,6 +110,9 @@ function RunSimulation()
         alert("Cannot run simulation - There are errors!\n\nFix any errors then try running again");
         return;
     }
+    
+    $(".playPauseBtn").removeClass("playBtn").addClass("pauseBtn");
+    $(".stepBtn").removeClass("active");
     
     var playFromNode = _breakpointNode;
     for(var i = 0; i < _workspace.length; i++)
@@ -51,11 +129,12 @@ function RunSimulation()
         _WCState = 1;
         
         playFromNode.bIsActive = true;
+        var oldBreakpoint = playFromNode.bIsBreakpoint; //So people can disable while broken
         playFromNode.bIsBreakpoint = false;
         playFromNode.fire();
         if(playFromNode === _breakpointNode)
         {
-            playFromNode.bIsBreakpoint = true;
+            playFromNode.bIsBreakpoint = oldBreakpoint;
             console.info("[" + playFromNode.constructor.name + "@" + playFromNode.getId() + "] Breakpoint resumed");
         }
         else
@@ -67,6 +146,37 @@ function RunSimulation()
     }
 }
 
+function StepSimulation()
+{
+    if(_WCState !== 2)
+        return;
+    
+    if(lastErrors.length > 0)
+    {
+        $("#errorListTabBtn").click();
+        alert("Cannot step simulation - There are errors!\n\nFix any errors then try running again");
+        return;
+    }
+    
+    if(_breakpointNode === undefined)
+    {
+        console.warn("_breakpointNode was undefined while paused/broken");
+        return;
+    }
+            
+    _WCState = 1;
+    
+    _breakpointNode.bIsActive = true;
+    var oldBreakpoint = _breakpointNode.bIsBreakpoint; //So people can disable while broken
+    _breakpointNode.bIsBreakpoint = false;
+    _breakpointNode.fire();  
+    _breakpointNode.bIsBreakpoint = oldBreakpoint;
+    
+    _WCState = 3;
+        
+    _breakpointNode = undefined;
+}
+
 function StopSimulation()
 {
     _WCState = 0;
@@ -75,15 +185,32 @@ function StopSimulation()
         _workspace[i].reset();
         _workspace[i].bIsActive = false;
     }
+    
+    $(".playPauseBtn").removeClass("pauseBtn").addClass("playBtn");
+    $(".stepBtn").removeClass("active");
+    _breakpointNode = undefined;
+    _currentNode = undefined;
+    
     console.info("Program simulation stopped");
 }
 
-function PauseSimulation(bFocusOnNode)
+function PauseSimulation(bFocusOnNode, bWasBreak)
 {
+    var bWasStep = _WCState === 3;
+    
     _WCState = 2;
     _breakpointNode = _currentNode;
     SelectNode(_breakpointNode, true);
-    console.info("[" + _breakpointNode.constructor.name + "@" + this.getId() + "] Paused by user");
+    
+    $(".playPauseBtn").removeClass("pauseBtn").addClass("playBtn");
+    $(".stepBtn").addClass("active");
+    
+    if(bWasStep)
+        console.info("[" + _breakpointNode.constructor.name + "@" + _breakpointNode.getId() + "] Stepped");
+    else if(bWasBreak === true)
+        console.info("[" + _breakpointNode.constructor.name + "@" + _breakpointNode.getId() + "] Breakpoint triggered");
+    else
+        console.info("[" + _breakpointNode.constructor.name + "@" + _breakpointNode.getId() + "] Paused by user");
 }
 
 function SelectNode(node, bFocus)

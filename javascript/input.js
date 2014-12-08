@@ -9,7 +9,7 @@
 var ConfirmNode = (function(_super)
 {
     __extends(ConfirmNode, _super);
-    sidebar.AddToSidebar("ConfirmNode", "Confirm", "Input");
+    sidebar.AddToSidebar("ConfirmNode", "Confirm", "Input", "nodesInput", 0, 0);
     function ConfirmNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -44,7 +44,7 @@ var ConfirmNode = (function(_super)
             val = '"' + this.properties.message.value + '"';
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;   
         }
         finalCode += val + ")";
@@ -52,7 +52,7 @@ var ConfirmNode = (function(_super)
         val = this.outputs[1].getCodeString();
         if(val !== undefined)
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             finalCode = val[0].code + " = " + finalCode;
         }
         
@@ -65,7 +65,7 @@ var ConfirmNode = (function(_super)
 var PromptNode = (function(_super)
 {
     __extends(PromptNode, _super);
-    sidebar.AddToSidebar("PromptNode", "Prompt", "Input");
+    sidebar.AddToSidebar("PromptNode", "Prompt", "Input", "nodesInput", 64, 0);
     function PromptNode(spawnPos)
 	{
         _super.call(this, spawnPos);
@@ -102,7 +102,7 @@ var PromptNode = (function(_super)
             val = '"' + this.properties.message.value + '"';
         else
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         finalCode += val + ", "; 
@@ -112,7 +112,7 @@ var PromptNode = (function(_super)
             val = '"' + this.properties.defaultval.value + '"';
         else
         {   
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             val = val[0].code;
         }
         finalCode += val + ")";
@@ -120,7 +120,7 @@ var PromptNode = (function(_super)
         val = this.outputs[1].getCodeString();
         if(val !== undefined)
         {
-            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            if(val[0].vars !== undefined) for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             finalCode = val[0].code + " = " + finalCode;
         }
         

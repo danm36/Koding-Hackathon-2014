@@ -47,6 +47,7 @@ canvas.cursorDrag
     max-height: 256px;
     box-shadow: 0px -4px 8px #B2B2B2;
     border-top: 1px solid #929292;
+    background: #FFFFFF;
 }
 
 #drawer > div
@@ -62,7 +63,7 @@ canvas.cursorDrag
     height: 100%;
 }
 
-#tabs
+#tabZone
 {
     background: #D7D7D7;
     padding-left: 8px;
@@ -70,7 +71,7 @@ canvas.cursorDrag
     border-bottom: 1px solid #929292;
 }
 
-#tabs span
+#tabZone span
 {
     display: inline-block;
     padding: 2px 9px;
@@ -78,12 +79,61 @@ canvas.cursorDrag
     cursor: pointer;
 }
 
-#tabs span.active
+#tabZone span.active
 {
     padding: 2px 8px;
     background: linear-gradient(to bottom, #D7D7D7 0%, #BBBBBB 50%, #D7D7D7 100%);
     border-right: 1px solid #929292;
     border-left: 1px solid #929292;
+}
+
+#simSettings
+{
+    padding-top: 1px;
+    float: right;
+}
+
+#simSettings input, #simSettings button
+{
+    font-size: 10px;
+    padding: 0px;  
+    width: 64px;
+    vertical-align: top;
+}
+
+#simSettings button
+{
+    width: 16px;
+    height: 16px;
+    padding: 0px;
+    background: url('../images/plackbackBtns.png');
+    background-size: 48px 12px;
+}
+
+#simSettings button.playBtn
+{
+    background-position: 0px 0px;
+}
+
+#simSettings button.pauseBtn
+{
+    background-position: -12px 0px;
+}
+
+#simSettings button.stopBtn
+{
+    background-position: -24px 0px;
+}
+
+#simSettings button.stepBtn
+{
+    background-position: -36px 0px;
+    display: none;
+}
+
+#simSettings button.stepBtn.active
+{
+    display: inline-block;
 }
 
 #drawerContent
