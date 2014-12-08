@@ -203,8 +203,6 @@ function onLoad()
                     $("#generatedCodeTabBtn").click();
                     break;
 			}
-            
-            console.log(e.which);
 		});
         
         window.addEventListener('keyup', function(e)
