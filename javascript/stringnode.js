@@ -53,7 +53,7 @@ var StrToUpperCaseNode = (function(_super)
             val = val[0].code;   
         }
         
-        return [{ code: val + ".toUpperCase()", vars: vars }];   
+        return [{ code: "String(" + val + ").toUpperCase()", vars: vars }];   
     }
 	    		
     return StrToUpperCaseNode;
@@ -106,7 +106,7 @@ var StrToLowerCaseNode = (function(_super)
             val = val[0].code;   
         }
         
-        return [{ code: val + ".toLowerCase()", vars: vars }];   
+        return [{ code: "String(" + val + ").toLowerCase()", vars: vars }];   
     }
 	    		
     return StrToLowerCaseNode;
@@ -171,7 +171,7 @@ var StrConcatNode = (function(_super)
             val2 = val2[0].code; 
         }
         
-        return [{ code: val1 + ".concat(" + val2 + ")", vars: vars }];   
+        return [{ code: "String(" + val1 + ").concat(" + val2 + ")", vars: vars }];   
     }
 	    		
     return StrConcatNode;
@@ -218,7 +218,7 @@ var StrIndexOfNode = (function(_super)
     
     StrIndexOfNode.prototype.getCodeString = function()
     {    
-        var finalCode = "";
+        var finalCode = "String(";
         var vars = [];
         
         var val = this.inputs[0].getCodeString();
@@ -230,7 +230,7 @@ var StrIndexOfNode = (function(_super)
             val = val[0].code;  
         }
         
-        finalCode += val + ".indexOf(";
+        finalCode += val + ").indexOf(";
         
         val = this.inputs[1].getCodeString();
         if(val === undefined)
@@ -290,7 +290,7 @@ var StrLastIndexOfNode = (function(_super)
     
     StrLastIndexOfNode.prototype.getCodeString = function()
     {    
-        var finalCode = "";
+        var finalCode = "String(";
         var vars = [];
         
         var val = this.inputs[0].getCodeString();
@@ -302,7 +302,7 @@ var StrLastIndexOfNode = (function(_super)
             val = val[0].code;   
         }
         
-        finalCode += val + ".lastIndexOf(";
+        finalCode += val + ").lastIndexOf(";
         
         val = this.inputs[1].getCodeString();
         if(val === undefined)
@@ -368,7 +368,7 @@ var SubstrNode = (function(_super)
     
     SubstrNode.prototype.getCodeString = function()
     {    
-        var finalCode = "";
+        var finalCode = "String(";
         var vars = [];
         
         var val = this.inputs[0].getCodeString();
@@ -380,7 +380,7 @@ var SubstrNode = (function(_super)
             val = val[0].code;   
         }
         
-        finalCode += val + ".subsr(";
+        finalCode += val + ").subsr(";
         
         val = this.inputs[1].getCodeString();
         if(val === undefined)
@@ -420,7 +420,7 @@ var StrReplaceNode = (function(_super)
     
     StrReplaceNode.prototype.onCreate = function()
     {
-        this.displayName = "Substring";
+        this.displayName = "Replace";
         this.inputs.push(new NodePin(this, "String", "string"));
         this.inputs.push(new NodePin(this, "Search", "string"));
         this.inputs.push(new NodePin(this, "Replace", "string"));
@@ -456,7 +456,7 @@ var StrReplaceNode = (function(_super)
     StrReplaceNode.prototype.getCodeString = function()
     {
         var regexCode = "new RegExp(";
-        var finalCode = "";
+        var finalCode = "String(";
         var vars = [];
         
         var val = this.inputs[0].getCodeString();
@@ -468,7 +468,7 @@ var StrReplaceNode = (function(_super)
             val = val[0].code;  
         }
         
-        finalCode += val;
+        finalCode += val + ")";
         
         val = this.inputs[1].getCodeString() || this.properties.search.value;
         if(val === undefined || val == "")
