@@ -62,7 +62,7 @@ var FunctionNode = (function(_super)
     
     FunctionNode.prototype.getCodeString = function()
     {
-        return [{ code: "function " + this.properties.name.value + "(params)", indent: true }].concat(this.outputs[0].getCodeString());   
+        return [{ code: "function " + this.properties.name.value + "(params)", indent: true, dontsemi: true }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return FunctionNode;
@@ -93,7 +93,7 @@ var MainFunctionNode = (function(_super)
  
     MainFunctionNode.prototype.getCodeString = function()
     {
-        return [{ code: "function Main()", indent: true }].concat(this.outputs[0].getCodeString());   
+        return [{ code: "function Main()", indent: true, dontsemi: true  }].concat(this.outputs[0].getCodeString());   
     }
     
     return MainFunctionNode;
@@ -197,7 +197,7 @@ var CallFunctionNode = (function(_super)
             }
             params += "]";
         }
-        return [{ code: this.properties.toCall.value + "(" + params + ");" }].concat(this.outputs[0].getCodeString());   
+        return [{ code: this.properties.toCall.value + "(" + params + ");", dontsemi: true  }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return CallFunctionNode;

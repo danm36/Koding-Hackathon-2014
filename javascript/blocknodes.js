@@ -46,17 +46,21 @@ var IfNode = (function(_super)
     IfNode.prototype.getCodeString = function()
     {
         var finalCode = "if(";
+        var vars = [];        
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
             val = "false /* Error: Missing node connection */";
         else
-            val = val[0].code;        
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            val = val[0].code; 
+        }
         finalCode += val + ")";
         
         var trueBranch = this.outputs[0].getCodeString();
         var falseBranch = this.outputs[1].getCodeString();
-        var result = [{ code: finalCode, indent: true }];
+        var result = [{ code: finalCode, indent: true, dontsemi: true, vars: vars }];
         var postIf = undefined;
         
         if(trueBranch !== undefined)
@@ -75,7 +79,7 @@ var IfNode = (function(_super)
             
             if(falseBranch !== undefined)
             {
-                result.push({code: "else", indent: true});
+                result.push({code: "else", indent: true, dontsemi: true });
                 for(var i = 0; i < falseBranch.length; i++)
                 {
                     if(falseBranch[i] == undefined)
@@ -88,11 +92,7 @@ var IfNode = (function(_super)
             
             result = result.concat(postIf);
         }
-        
-        console.log(result);
-        console.log(trueBranch);
-        console.log(falseBranch);
-        
+                
         return result;   
     }
 	    		
@@ -177,15 +177,19 @@ var WhileNode = (function(_super)
     WhileNode.prototype.getCodeString = function()
     {
         var finalCode = "while(";
+        var vars = [];
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
             val = "false /* Error: Missing node connection */";
         else
-            val = val[0].code;        
-        finalCode += val + ");";
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            val = val[0].code;   
+        }
+        finalCode += val + ")";
         
-        return [{ code: finalCode, indent: true }].concat(this.outputs[0].getCodeString());   
+        return [{ code: finalCode, indent: true, dontsemi: true, vars: vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return WhileNode;

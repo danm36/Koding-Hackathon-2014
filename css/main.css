@@ -159,7 +159,7 @@ canvas.cursorDrag
     content: " (!) ";   
 }
 
-#codeRefreshBtn
+#codeGenControlPanel
 {
     float: right;
     margin-top: -4px;

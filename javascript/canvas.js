@@ -118,12 +118,14 @@ function onLoad()
             if(selectedEl !== undefined)
             {
                 if(selectedEl instanceof NodePin)
-                    selectedEl = selectedEl.parent;
+                    SelectNode(selectedEl.parent);
                 if(selectedEl.onMouseUp() !== true)
                     SelectNode(selectedEl);
                 else
-                    selectedEl = undefined;
+                    SelectNode(undefined);
             }
+            else
+                SelectNode(undefined);
             
             if(draggingEl !== undefined)
             {

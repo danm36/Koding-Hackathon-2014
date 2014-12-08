@@ -109,7 +109,10 @@ var BasicNode = (function()
     BasicNode.prototype.getValue = function(pin)
     {
         if(pin instanceof NodePin && pin.connectee !== undefined)
-            return pin.connectee.parent.getValue(undefined) || pin.connectee.lastValue;
+        {
+            var ret = pin.connectee.parent.getValue(undefined) ;
+            return ret !== undefined ? ret : pin.connectee.lastValue;
+        }
         return undefined;
     }
     
@@ -335,6 +338,7 @@ var NodePin = (function()
                             if(_workspace[i].inputs[j].connectee !== undefined)
                                 _workspace[i].inputs[j].connectee.connectee = undefined;
                             _workspace[i].inputs[j].connectee = this;
+                            RefreshCode(true);
                             return;
                         }
                     }
@@ -349,6 +353,7 @@ var NodePin = (function()
                             if(_workspace[i].outputs[j].connectee !== undefined)
                                 _workspace[i].outputs[j].connectee.connectee = undefined;
                             _workspace[i].outputs[j].connectee = this;
+                            RefreshCode(true);
                             return;
                         }
                     }
@@ -371,6 +376,7 @@ var NodePin = (function()
                                     this.connectee.connectee.connectee = undefined;
                                 this.connectee.connectee = this;
                             }
+                            RefreshCode(true);
                             return;
                         }
                     }
@@ -392,12 +398,22 @@ var NodePin = (function()
                                     this.connectee.connectee.connectee = undefined;
                                 this.connectee.connectee = this;
                             }
+                            RefreshCode(true);
                             return;
                         }
                     }
                 }
             }
         }
+        
+        RefreshCode(true);
+    }
+    
+    NodePin.prototype.getValue = function()
+    {
+        if(this.connectee !== undefined)
+            return this.connectee.parent.getValue(undefined);
+        return undefined;
     }
     
     NodePin.prototype.getCodeString = function()
@@ -534,10 +550,20 @@ var NodePin = (function()
                                            this.drawPos.x + this.radius / 2 + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) :
                                            this.drawPos.x + this.radius / 2 - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64),
                                            Lerp(this.drawPos.y + this.radius / 2, lineEndPoint.y, 0.05));
-            var controlPoint2 = new Vector(this.isOutput ?
-                                           lineEndPoint.x - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) :
-                                           lineEndPoint.x + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64),
-                                           Lerp(this.drawPos.y + this.radius / 2, lineEndPoint.y, 0.95));
+            
+            var controlPoint2 = undefined;
+            if(this.connectee !== undefined && this.connectee.bIsVarNode) //Try to dive towards the node rather than come in from the side
+            {
+                var controlPoint2 = new Vector(this.drawPos.x - lineEndPoint.x, this.drawPos.y - lineEndPoint.y).GetNormalized().Multiply(50).Add(new Vector(lineEndPoint.x, lineEndPoint.y));
+            }
+            else
+            {
+                var controlPoint2 = new Vector(this.isOutput ?
+                                                lineEndPoint.x - Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x + 48), 256), 64) :
+                                                lineEndPoint.x + Math.max(Math.min(Math.abs(this.drawPos.x - lineEndPoint.x), 256), 64),
+                                            Lerp(this.drawPos.y + this.radius / 2, lineEndPoint.y, 0.95));
+            }
+            
             ctx.beginPath();
             ctx.moveTo(this.drawPos.x + this.radius / 2, this.drawPos.y + this.radius / 2);
             ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y,

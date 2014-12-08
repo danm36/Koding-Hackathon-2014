@@ -36,16 +36,68 @@ var ConsoleLogNode = (function(_super)
     ConsoleLogNode.prototype.getCodeString = function()
     {
         var finalCode = "console.log(";
+        var vars = [];
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
             val = '"' + this.properties.output.value + '"';
         else
-            val = val[0].code;        
-        finalCode += val + ");";
+        {
+            vars = val[0].vars;
+            val = val[0].code;         
+        }
+        finalCode += val + ")";
         
-        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
+        return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return ConsoleLogNode;
+})(BasicNode);
+
+var AlertNode = (function(_super)
+{
+    __extends(AlertNode, _super);
+    sidebar.AddToSidebar("AlertNode", "Alert", "Output");
+    function AlertNode(spawnPos)
+	{
+        _super.call(this, spawnPos);
+    }
+    
+    AlertNode.prototype.onCreate = function()
+    {
+        this.displayName = "confirm()";
+        this.inputs.push(new NodePin(this, "In", "flow"));
+        this.inputs.push(new NodePin(this, "Message", "string"));
+        this.outputs.push(new NodePin(this, "Out", "flow"));
+        
+        this.properties = {
+            message: { type: "string", value: "Something happened" },
+        };
+    }
+    
+    AlertNode.prototype.execute = function()
+    {
+        alert(this.getValue(this.inputs[1]) || this.properties.message.value);
+        this.outputs[0].fire();   
+    }
+    
+    AlertNode.prototype.getCodeString = function()
+    {
+        var finalCode = "alert(";
+        var vars = [];
+        var val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = '"' + this.properties.message.value + '"';
+        else
+        {
+            vars = val[0].vars;
+            val = val[0].code;   
+        }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
+    }
+	    		
+    return AlertNode;
 })(BasicNode);

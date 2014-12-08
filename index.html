@@ -12,14 +12,19 @@ Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk23
 	<script type="text/javascript" src="javascript/vector.js"></script>
 	<script type="text/javascript" src="javascript/globalvars.js"></script>
 	<script type="text/javascript" src="javascript/sidebar.js"></script>
+    
 	<script type="text/javascript" src="javascript/basicnode.js"></script>
-	<script type="text/javascript" src="javascript/variables.js"></script>
-	<script type="text/javascript" src="javascript/functions.js"></script>
+    <script type="text/javascript" src="javascript/functions.js"></script>
 	<script type="text/javascript" src="javascript/blocknodes.js"></script>
-    <script type="text/javascript" src="javascript/logicalnodes.js"></script>
+    
+	<script type="text/javascript" src="javascript/variables.js"></script>
 	<script type="text/javascript" src="javascript/input.js"></script>
 	<script type="text/javascript" src="javascript/output.js"></script>
+    
+    <script type="text/javascript" src="javascript/logicalnodes.js"></script>
 	<script type="text/javascript" src="javascript/mathnodes.js"></script>
+    <script type="text/javascript" src="javascript/stringnode.js"></script>
+    
 	<script type="text/javascript" src="javascript/drawer.js"></script>
 	<script type="text/javascript" src="javascript/canvas.js"></script>
 	<link rel="stylesheet" href="css/main.css" />
@@ -45,7 +50,10 @@ Written by Daniel Masterson [Axon] for the Koding 2014 Hackathon - http://udkk23
                 <div id="errorOutput">
                 </div>
                 <div id="generatedCode">
-                    <button id="codeRefreshBtn" onclick="RefreshCode();">Refresh Code</button>
+                    <div id="codeGenControlPanel">
+                        <label><input id="codeAutoRefreshCheck" type="checkbox" checked />Auto Generate</label>
+                        <button id="codeRefreshBtn" onclick="RefreshCode();">Refresh Code</button>
+                    </div>
                     <div id="codeOutput"></div>
                 </div>
             </div>

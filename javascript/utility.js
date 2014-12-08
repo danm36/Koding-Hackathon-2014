@@ -39,7 +39,7 @@ function RunSimulation()
     var playFromNode = _breakpointNode;
     for(var i = 0; i < _workspace.length; i++)
     {
-        if(_breakpointNode !== undefined)
+        if(_breakpointNode === undefined)
             _workspace[i].reset();
         _workspace[i].bIsActive = false;
         if(_breakpointNode === undefined && _workspace[i] instanceof MainFunctionNode)
@@ -90,7 +90,7 @@ function SelectNode(node, bFocus)
 {
     $("#propArea").empty();
     selectedEl = undefined;
-
+    lastUpdateNode = undefined;
     
     if(!(node instanceof BasicNode))
     {
@@ -108,8 +108,8 @@ function SelectNode(node, bFocus)
             }
         }
     }
-        
-    selectedEl = node;
+      
+    lastUpdateNode = selectedEl = node;
     SelectNodeProperties(node);
     
     if(bFocus)

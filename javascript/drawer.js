@@ -95,7 +95,7 @@ function SelectNodeProperties(node)
                 toAppend += "<tr><td>" + prop + "</td><td><input type=\"checkbox\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'bool');\" value=\"true\" " + (node.properties[prop].value == true ? "checked" : "") + "/></td></tr>";
                 break;
             case "number":
-                toAppend += "<tr><td>" + prop + "</td><td><input type=\"number\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'number');\" value=\"" + node.properties[prop].value + "\" step=\"" + (node.properties[prop].step || "any") + "\" " + (node.properties[prop].min !== undefined ? "min=\"" + node.properties[prop].min + "\"" : "") + "  " + (node.properties[prop].max !== undefined ? "max=\"" + node.properties[prop].max + "\"" : "") + " /></td></tr>";
+                toAppend += "<tr><td>" + prop + "</td><td><input type=\"number\" onkeyup=\"UpdateNodeProp(this, '" + prop + "', 'number');\" onchange=\"UpdateNodeProp(this, '" + prop + "', 'number');\" value=\"" + node.properties[prop].value + "\" step=\"" + (node.properties[prop].step || "any") + "\" " + (node.properties[prop].min !== undefined ? "min=\"" + node.properties[prop].min + "\"" : "") + "  " + (node.properties[prop].max !== undefined ? "max=\"" + node.properties[prop].max + "\"" : "") + " /></td></tr>";
                 break;
             case "object":
                 toAppend += "<tr><td>" + prop + "</td><td>Objects not currently handled</td></tr>";
@@ -113,34 +113,36 @@ function SelectNodeProperties(node)
     $("#propArea").append(toAppend);
 }
 
+var lastUpdateNode;
 function UpdateNodeProp(el, prop, type)
 {
-    if(selectedEl == undefined)
+    if(lastUpdateNode == undefined)
         return;
     
     if(type == "bool")
     {
-        selectedEl.properties[prop].value = el.checked;
+        lastUpdateNode.properties[prop].value = el.checked;
     }
     else if(type == "number")
     {
         val = parseFloat(el.value);
         
-        if(selectedEl.properties[prop].max !== undefined)
+        if(lastUpdateNode.properties[prop].max !== undefined)
             val = Math.min(val, selectedEl.properties[prop].max);
-        if(selectedEl.properties[prop].min !== undefined)
+        if(lastUpdateNode.properties[prop].min !== undefined)
             val = Math.max(val, selectedEl.properties[prop].min);
-        if(selectedEl.properties[prop].step !== undefined)
+        if(lastUpdateNode.properties[prop].step !== undefined)
             val = Math.round(val / selectedEl.properties[prop].step) * selectedEl.properties[prop].step;
         
         el.value = val;
-        selectedEl.properties[prop].value = parseFloat(val);
+        lastUpdateNode.properties[prop].value = parseFloat(val);
     }
     else
     {
-        selectedEl.properties[prop].value = el.value;
+        lastUpdateNode.properties[prop].value = el.value;
     }
-    selectedEl.reset();
+    lastUpdateNode.reset();
+    RefreshCode(true);
 }
 
 
@@ -205,9 +207,12 @@ function CheckForNewErrors()
     curErrors = [];
 }
 
-function RefreshCode()
+function RefreshCode(isAuto)
 {
-    if(lastErrors.length > 0)
+    if(isAuto === true && !$("#codeAutoRefreshCheck").is(":checked"))
+        return;
+    
+    if(lastErrors.length > 0 && isAuto !== true)
     {
         console.warn("Failed to generate code - There are some errors present");
         return;
@@ -221,13 +226,26 @@ function RefreshCode()
         if(_workspace[n] instanceof MainFunctionNode || _workspace[n] instanceof FunctionNode)
         {
             var cs = _workspace[n].getCodeString();
+            var seenVars = [];
             for(var i = 0; i < cs.length; i++)
             {
                 if(cs[i] === undefined)
                     break;
                 
+                if(cs[i].vars !== undefined)
+                {
+                    for(var j = 0; j < cs[i].vars.length; j++)
+                    {
+                        if(seenVars.indexOf(cs[i].vars[j].name) < 0)
+                        {
+                            toAppend += "<div class=\"logRow\">" + ("var " + cs[i].vars[j].name + " = " + cs[i].vars[j].default + ";").addLeft(indentLevel * 4, "&nbsp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</div>";
+                            seenVars.push(cs[i].vars[j].name);
+                        }
+                    }
+                }
+                
                 if(cs[i].code !== undefined)
-                    toAppend += "<div class=\"logRow\">" + cs[i].code.addLeft(indentLevel * 4, "&nbsp;") + "</div>";
+                    toAppend += "<div class=\"logRow\">" + cs[i].code.addLeft(indentLevel * 4, "&nbsp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + (cs[i].dontsemi !== true ? ";" : "") +  "</div>";
                 
                 if(cs[i].indent === true)
                 {                

@@ -24,10 +24,47 @@ var SetVarNode = (function(_super)
         this.outputs.push(new NodePin(this, "Result", "var"));
     }
     
+    SetVarNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'Var' parameter";
+        else if(this.outputs[1].connectee == undefined)
+            this.curError = "Missing 'Result' parameter";
+    }
+    
     SetVarNode.prototype.execute = function()
     {
         this.setValue(this.outputs[1], this.getValue(this.inputs[1]));
         this.outputs[0].fire();
+    }
+    
+    SetVarNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "";
+        var vars = [];
+        
+        var val = this.outputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing result node */";
+        else
+            val = val[0].code;   
+        
+        vars.concat(val[0].vars);
+        
+        finalCode += val + " = ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing var node */";
+        else
+            val = val[0].code;   
+        
+        vars.concat(val[0].vars);
+        finalCode += val;
+        
+        return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return SetVarNode;
@@ -50,17 +87,49 @@ var AddNode = (function(_super)
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
     
+    AddNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'A' parameter";
+        else if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'B' parameter";
+    }
+    
     AddNode.prototype.getValue = function(pin)
     {
-        try
+        return this.inputs[0].connectee.parent.getValue(undefined) + this.inputs[1].connectee.parent.getValue(undefined);
+    }
+    
+    AddNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "(";
+        var vars = []
+        
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
         {
-            return this.inputs[0].connectee.parent.getValue(undefined) + this.inputs[1].connectee.parent.getValue(undefined);
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            val = val[0].code;          
         }
-        catch(err)
-        {
-            console.error(err);
-            _WCState = 2;
+        
+        finalCode += val + " + ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing B node */";
+        else
+        {     
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);  
+            val = val[0].code;
         }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }];    
     }
 	    		
     return AddNode;
@@ -82,18 +151,50 @@ var SubtractNode = (function(_super)
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
+    
+    SubtractNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'A' parameter";
+        else if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'B' parameter";
+    }
 	    	
     SubtractNode.prototype.getValue = function(pin)
     {
-        try
-        {
-            return this.inputs[0].connectee.parent.getValue(undefined) - this.inputs[1].connectee.parent.getValue(undefined);
+        return this.inputs[0].connectee.parent.getValue(undefined) - this.inputs[1].connectee.parent.getValue(undefined);
+    }
+    
+    SubtractNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "(";
+        var vars = []
+        
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+        {  
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]);
+            val = val[0].code;
         }
-        catch(err)
+        
+        finalCode += val + " - ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing B node */";
+        else
         {
-            console.error(err);
-            _WCState = 2;
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }];    
     }
     
     return SubtractNode;
@@ -116,17 +217,49 @@ var MultiplyNode = (function(_super)
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
     
+    MultiplyNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'A' parameter";
+        else if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'B' parameter";
+    }
+    
     MultiplyNode.prototype.getValue = function(pin)
     {
-        try
-        {
-            return this.inputs[0].connectee.parent.getValue(undefined) * this.inputs[1].connectee.parent.getValue(undefined);
+        return this.inputs[0].connectee.parent.getValue(undefined) * this.inputs[1].connectee.parent.getValue(undefined);
+    }
+    
+    MultiplyNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "(";
+        var vars = []
+        
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+        {   
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
-        catch(err)
+        
+        finalCode += val + " * ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing B node */";
+        else
         {
-            console.error(err);
-            _WCState = 2;
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }];    
     }
     	    		
     return MultiplyNode;
@@ -148,18 +281,50 @@ var DivideNode = (function(_super)
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
+    
+    DivideNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'A' parameter";
+        else if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'B' parameter";
+    }
     	
     DivideNode.prototype.getValue = function(pin)
     {
-        try
+        return this.inputs[0].connectee.parent.getValue(undefined) / this.inputs[1].connectee.parent.getValue(undefined);
+    }
+    
+    DivideNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "(";
+        var vars = []
+        
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
         {
-            return this.inputs[0].connectee.parent.getValue(undefined) / this.inputs[1].connectee.parent.getValue(undefined);
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
-        catch(err)
-        {
-            console.error(err);
-            _WCState = 2;
+        
+        finalCode += val + " / ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing B node */";
+        else
+        {  
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }];    
     }
     
     return DivideNode;
@@ -181,18 +346,50 @@ var ModuloNode = (function(_super)
         this.inputs.push(new NodePin(this, "B", "number"));
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
+    
+    ModuloNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'A' parameter";
+        else if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'B' parameter";
+    }
     	 
     ModuloNode.prototype.getValue = function(pin)
     {
-        try
-        {
-            return this.inputs[0].connectee.parent.getValue(undefined) % this.inputs[1].connectee.parent.getValue(undefined);
+        return this.inputs[0].connectee.parent.getValue(undefined) % this.inputs[1].connectee.parent.getValue(undefined);
+    }
+    
+    ModuloNode.prototype.getCodeString = function()
+    {    
+        var finalCode = "(";
+        var vars = []
+        
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+        {       
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
-        catch(err)
-        {
-            console.error(err);
-            _WCState = 2;
+        
+        finalCode += val + " % ";
+        
+        val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing B node */";
+        else
+        { 
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
         }
+        
+        finalCode += val + ")";
+        
+        return [{ code: finalCode, vars: vars }];   
     }
     
     return ModuloNode;
@@ -215,12 +412,31 @@ var IncrementNode = (function(_super)
         this.outputs.push(new NodePin(this, "Out", "flow"));
     }
     
+    IncrementNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'Var' parameter";
+    }
+    
     IncrementNode.prototype.execute = function()
     {
-        this.setValue(this.inputs[1], this.getValue(this.inputs[1]) + 1);
+        this.setValue(this.inputs[1], parseFloat(this.getValue(this.inputs[1])) + 1);
         this.outputs[0].fire();
     }
-	    		
+	    	
+    IncrementNode.prototype.getCodeString = function()
+    {    
+        var val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+            val = val[0].code + "++"; 
+        
+        return [{ code: val, vars: val.vars }].concat(this.outputs[0].getCodeString());   
+    }
+    
     return IncrementNode;
 })(BasicNode);
 
@@ -241,10 +457,29 @@ var DecrementNode = (function(_super)
         this.outputs.push(new NodePin(this, "Out", "flow"));
     }
     
+    DecrementNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[1].getValue() == undefined)
+            this.curError = "Missing 'Var' parameter";
+    }
+    
     DecrementNode.prototype.execute = function()
     {
-        this.setValue(this.inputs[1], this.getValue(this.inputs[1]) - 1);
+        this.setValue(this.inputs[1], parseFloat(this.getValue(this.inputs[1])) - 1);
         this.outputs[0].fire();
+    }
+    
+    DecrementNode.prototype.getCodeString = function()
+    {    
+        var val = this.inputs[1].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+            val = val[0].code + "--"; 
+        
+        return [{ code: val, vars: val.vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return DecrementNode;
@@ -266,12 +501,37 @@ var IncrementInlineNode = (function(_super)
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
     
+    IncrementInlineNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'Var' parameter";
+    }
+    
     IncrementInlineNode.prototype.getValue = function(pin)
     {
-        this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() + 1);
-        return this.inputs[0].connectee.parent.getValue();
+        if(this.inputs[0].connectee !== undefined)
+        {
+            if(_WCState === 1)
+                this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() + 1);
+            return this.inputs[0].connectee.parent.getValue();
+        }
+        
+        return undefined;
     }
 	    		
+    IncrementInlineNode.prototype.getCodeString = function()
+    {    
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+            val = val[0].code + "++"; 
+        
+        return [{ code: val, vars: val.vars }];   
+    }
+    
     return IncrementInlineNode;
 })(BasicNode);
 
@@ -291,10 +551,35 @@ var DecrementInlineNode = (function(_super)
         this.outputs.push(new NodePin(this, "Result", "number"));
     }
     
+    DecrementInlineNode.prototype.reset = function()
+    {
+        this.curError = undefined;
+        
+        if(this.inputs[0].getValue() == undefined)
+            this.curError = "Missing 'Var' parameter";
+    }
+    
     DecrementInlineNode.prototype.getValue = function(pin)
     {
-        this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() - 1);
-        return this.inputs[0].connectee.parent.getValue();
+        if(this.inputs[0].connectee !== undefined)
+        {
+            if(_WCState === 1)
+                this.inputs[0].connectee.parent.setValue(undefined, this.inputs[0].connectee.parent.getValue() - 1);
+            return this.inputs[0].connectee.parent.getValue();
+        }
+        
+        return undefined;
+    }
+    
+    DecrementInlineNode.prototype.getCodeString = function()
+    {    
+        var val = this.inputs[0].getCodeString();
+        if(val === undefined)
+            val = "/* Error, missing A node */";
+        else
+            val = val[0].code + "++"; 
+        
+        return [{ code: val, vars: val.vars }];   
     }
 	    		
     return DecrementInlineNode;

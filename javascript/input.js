@@ -37,19 +37,26 @@ var ConfirmNode = (function(_super)
     ConfirmNode.prototype.getCodeString = function()
     {
         var finalCode = "confirm(";
+        var vars = [];
         
         var val = this.inputs[1].getCodeString();
         if(val === undefined)
             val = '"' + this.properties.message.value + '"';
         else
-            val = val[0].code;        
-        finalCode += val + ");";
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;   
+        }
+        finalCode += val + ")";
         
         val = this.outputs[1].getCodeString();
         if(val !== undefined)
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             finalCode = val[0].code + " = " + finalCode;
+        }
         
-        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
+        return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return ConfirmNode;
@@ -88,26 +95,36 @@ var PromptNode = (function(_super)
     PromptNode.prototype.getCodeString = function()
     {
         var finalCode = "prompt(";
+        var vars = [];
         
         var val = this.inputs[1].getCodeString();
         if(val == undefined)
             val = '"' + this.properties.message.value + '"';
         else
-            val = val.code;        
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
+        }
         finalCode += val + ", "; 
         
         val = this.inputs[2].getCodeString();
         if(val === undefined)
-            val = '"' + this.properties.message.value + '"';
+            val = '"' + this.properties.defaultval.value + '"';
         else
-            val = val[0].code;        
-        finalCode += val + ");";
+        {   
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
+            val = val[0].code;
+        }
+        finalCode += val + ")";
         
         val = this.outputs[1].getCodeString();
         if(val !== undefined)
+        {
+            for(var i = 0; i < val[0].vars.length; i++) vars.push(val[0].vars[i]); 
             finalCode = val[0].code + " = " + finalCode;
+        }
         
-        return [{ code: finalCode }].concat(this.outputs[0].getCodeString());   
+        return [{ code: finalCode, vars: vars }].concat(this.outputs[0].getCodeString());   
     }
 	    		
     return PromptNode;

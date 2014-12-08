@@ -54,15 +54,23 @@ var VarNode = (function(_super)
         if(this.properties.isConst.value === true)
         {
             if(this.value instanceof Array)
-                return [{code: "Array[" + this.value.length + "]"}];
+                return [{code: "Array[" + this.value.length + "]", vars: []}];
             else if(this.value instanceof Object)
-                return [{code: "Object"}];
-            else if(this.properties.value.type != "number" && (typeof this.value == "string" || this.value instanceof String))
-                return [{code: "\"" + this.properties.value.value + "\""}];
+                return [{code: "Object", vars: []}];
+            else if(this.properties.value.type != "number" && (typeof this.properties.value.value == "string" || this.properties.value.value instanceof String))
+                return [{code: "\"" + this.properties.value.value + "\"", vars: []}];
             else
-                return [{code: String(this.properties.value.value)}];
+                return [{code: String(this.properties.value.value), vars: []}];
         }
-        return [{code: (this.properties.variableName.value.trim() != "" ? this.properties.variableName.value.trim() : this.type + this.getId()) }];   
+        
+        var defVal = this.properties.value.value;
+        if(this.properties.value.type != "number" && (typeof this.properties.value.value == "string" || this.properties.value.value instanceof String))
+            defVal = "\"" + this.properties.value.value + "\"";
+        
+        return [{
+            code: (this.properties.variableName.value.trim() != "" ? this.properties.variableName.value.trim() : this.type + this.getId()),
+            vars: [{ name: (this.properties.variableName.value.trim() != "" ? this.properties.variableName.value.trim() : this.type + this.getId()), default: defVal }],       
+        }];   
     }
     
     VarNode.prototype.update = function()
@@ -265,7 +273,7 @@ var NumberVarNode = (function(_super)
     
     NumberVarNode.prototype.getValue = function(pin)
     {
-        return this.value;
+        return parseFloat(this.value);
     }
     
     NumberVarNode.prototype.setValue = function(pin, value)
